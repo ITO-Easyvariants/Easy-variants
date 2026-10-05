@@ -1,0 +1,321 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-surface-variant: #e2e2e4;
+  --color-primary-fixed-dim: #c3c0ff;
+  --color-on-primary-container: #dad7ff;
+  --color-inverse-primary: #c3c0ff;
+  --color-error-container: #ffdad6;
+  --color-tertiary-fixed-dim: #ffb695;
+  --color-on-tertiary: #ffffff;
+  --color-surface-container-high: #e8e8ea;
+  --color-on-primary-fixed-variant: #3323cc;
+  --color-outline-variant: #c7c4d8;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f3f3f5;
+  --color-on-primary-fixed: #0f0069;
+  --color-surface-dim: #d9dadc;
+  --color-on-tertiary-container: #ffd2be;
+  --color-on-surface-variant: #464555;
+  --color-surface-container: #eeeef0;
+  --color-on-surface: #1a1c1d;
+  --color-secondary: #565e74;
+  --color-secondary-container: #dae2fd;
+  --color-on-tertiary-fixed-variant: #7b2f00;
+  --color-primary-container: #4f46e5;
+  --color-on-background: #1a1c1d;
+  --color-surface-container-highest: #e2e2e4;
+  --color-inverse-on-surface: #f0f0f2;
+  --color-on-secondary-container: #5c647a;
+  --color-outline: #777587;
+  --color-on-error-container: #93000a;
+  --color-on-error: #ffffff;
+  --color-surface-bright: #f9f9fb;
+  --color-on-primary: #ffffff;
+  --color-tertiary-fixed: #ffdbcc;
+  --color-tertiary-container: #a44100;
+  --color-on-secondary-fixed-variant: #3f465c;
+  --color-surface: #f9f9fb;
+  --color-primary: #3525cd;
+  --color-error: #ba1a1a;
+  --color-on-secondary: #ffffff;
+  --color-secondary-fixed-dim: #bec6e0;
+  --color-surface-tint: #4d44e3;
+  --color-on-tertiary-fixed: #351000;
+  --color-tertiary: #7e3000;
+  --color-on-secondary-fixed: #131b2e;
+  --color-background: #f9f9fb;
+  --color-inverse-surface: #2f3132;
+  --color-secondary-fixed: #dae2fd;
+  --color-primary-fixed: #e2dfff;
+  --color-brand-blue: #4f46e5;
+  --color-brand-purple: #7c3aed;
+
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply text-base font-body text-on-surface antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-headline);
+    color: var(--color-on-surface);
+  }
+}
+
+@layer components {
+  /* ── Typography scale (H1–H6, P1–P3) ── */
+  .ez-h1 {
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-[5.2rem] font-extrabold font-headline tracking-tighter text-on-surface leading-[1.05];
+  }
+
+  .ez-h2 {
+    @apply text-4xl md:text-5xl font-headline font-bold tracking-tight text-on-surface leading-[1.1];
+  }
+
+  .ez-h3 {
+    @apply text-2xl font-headline font-bold text-on-surface leading-snug;
+  }
+
+  .ez-h4 {
+    @apply text-xl font-headline font-bold text-on-surface leading-snug;
+  }
+
+  .ez-h5 {
+    @apply text-sm font-body font-semibold text-on-surface leading-normal;
+  }
+
+  .ez-h6 {
+    @apply text-xs font-label font-bold uppercase tracking-[0.2em] text-primary leading-tight;
+  }
+
+  .ez-p1 {
+    @apply text-lg font-body font-normal text-on-surface-variant leading-[1.65];
+  }
+
+  .ez-p2 {
+    @apply text-base font-body font-normal text-on-surface-variant leading-[1.6];
+  }
+
+  .ez-p3 {
+    @apply text-sm font-body font-normal text-on-surface-variant leading-normal;
+  }
+
+  .ez-p3-legal {
+    @apply text-[11px] font-body font-medium text-on-surface/80 tracking-wide leading-normal;
+  }
+
+  /* ── Shared page width + horizontal padding (all sections) ── */
+  .ez-page-shell {
+    @apply max-w-7xl mx-auto w-full px-6 md:px-8;
+  }
+
+  /* ── Shared vertical spacing (phone / tablet / desktop) ── */
+  .ez-section-spacing {
+    @apply py-14 md:py-20 lg:py-28;
+  }
+
+  /* ── Section headers (left-aligned by default) ── */
+  .ez-section-header {
+    @apply flex flex-col items-start max-w-2xl mb-10 md:mb-12 lg:mb-16 text-left;
+  }
+
+  .ez-section-header--center {
+    @apply mx-auto items-center text-center;
+  }
+
+  .ez-section-eyebrow {
+    @apply block w-full text-xs font-label font-bold uppercase tracking-[0.2em] text-primary leading-tight;
+  }
+
+  .ez-section-title {
+    @apply mt-2 mb-0 w-full text-3xl sm:text-4xl lg:text-5xl font-headline font-bold tracking-tight text-on-surface leading-[1.1];
+  }
+
+  /* Section headers that must not clip long titles (problem, advantage, etc.) */
+  .ez-section-header--fluid {
+    @apply max-w-none;
+  }
+
+  /* One-line section titles from sm+; wraps on very narrow phones */
+  .ez-section-title--single-line {
+    @apply max-w-none lg:text-4xl xl:text-5xl;
+  }
+
+  @media (min-width: 640px) {
+    .ez-section-title--single-line {
+      white-space: nowrap;
+    }
+  }
+
+  .ez-section-desc {
+    @apply mt-4 mb-0 w-full text-lg font-body font-normal text-on-surface-variant leading-[1.65];
+  }
+
+  /* ── Page hero ── */
+  .ez-page-title {
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-[5.2rem] font-extrabold font-headline tracking-tighter text-on-surface leading-[1.05];
+  }
+
+  .ez-page-badge {
+    @apply inline-flex items-center gap-2 px-4 py-1.5 bg-secondary-container rounded-full;
+  }
+
+  .ez-page-badge-text {
+    @apply text-[11px] uppercase tracking-[0.2em] font-bold text-on-secondary-container font-label;
+  }
+
+  /* ── Card & subsection titles ── */
+  .ez-subsection-title {
+    @apply text-2xl font-headline font-bold text-on-surface leading-snug;
+  }
+
+  .ez-card-title {
+    @apply text-xl font-headline font-bold text-on-surface leading-snug;
+  }
+
+  .ez-card-title--md {
+    @apply text-xl font-headline font-bold text-on-surface leading-snug;
+  }
+
+  .ez-card-title--lg {
+    @apply text-2xl font-headline font-bold text-on-surface leading-snug;
+  }
+
+  .ez-card-title--sm {
+    @apply text-sm font-body font-semibold text-on-surface leading-normal;
+  }
+
+  .ez-footer-title {
+    @apply text-xl font-headline font-extrabold text-on-surface tracking-tight leading-snug;
+  }
+
+  .ez-stat-value {
+    @apply text-2xl md:text-3xl font-extrabold font-headline text-primary;
+  }
+
+  .ez-cta-title {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-extrabold font-headline text-white tracking-tighter leading-[1.1];
+  }
+
+  .ez-nav-link {
+    @apply text-base font-body font-semibold text-on-surface-variant no-underline transition-colors duration-300;
+  }
+
+  .ez-nav-link:hover {
+    @apply text-on-surface;
+  }
+
+  /* ── Unified buttons (same height + line-height everywhere) ── */
+  .ev-pill-btn,
+  a.ev-pill-btn,
+  button.ev-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    min-height: 3.25rem;
+    height: 3.25rem;
+    padding: 0 1.75rem;
+    border-radius: 9999px;
+    font-family: Manrope, Inter, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.2;
+    color: #3525cd !important;
+    background: #ffffff;
+    border: none;
+    box-shadow: 0 6px 24px rgba(53, 37, 205, 0.28), 0 2px 8px rgba(53, 37, 205, 0.12);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .ev-pill-btn:hover,
+  a.ev-pill-btn:hover,
+  button.ev-pill-btn:hover {
+    background: #fafaff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(53, 37, 205, 0.34), 0 4px 14px rgba(53, 37, 205, 0.16);
+  }
+
+  .ev-pill-btn:active,
+  a.ev-pill-btn:active,
+  button.ev-pill-btn:active {
+    transform: scale(0.98);
+  }
+
+  .ev-pill-btn--sm {
+    padding: 0 1.35rem;
+    font-size: 0.875rem;
+    line-height: 1.2;
+  }
+
+  .ev-pill-btn--lg {
+    padding: 0 2.35rem;
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  .ev-pill-btn--dark {
+    color: #ffffff !important;
+    background: #1a1c1d;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .ev-pill-btn--dark:hover {
+    background: rgba(26, 28, 29, 0.9);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  }
+
+  .ev-pill-btn--block {
+    width: 100%;
+  }
+
+  .mobile-menu-light a.ev-pill-btn {
+    margin-top: 0.75rem;
+    border-bottom: none;
+    justify-content: center;
+  }
+
+  .ev-pill-btn .material-symbols-outlined {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+
+  /* Icon-only controls: same 3.25rem height as pill buttons */
+  .ez-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: 3.25rem;
+    height: 3.25rem;
+    min-height: 3.25rem;
+    padding: 0;
+    border-radius: 9999px;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  }
+
+  .ez-icon-btn .material-symbols-outlined {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+}

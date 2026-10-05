@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Leads Dashboard &middot; EasyVariants Admin</title>
+  <link rel="icon" type="image/png" href="/images/EV logo.png" />
+  <link rel="apple-touch-icon" href="/images/EV logo.png" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #1a1c1d;
+      background: #f6f7fb;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid rgba(199, 196, 216, 0.25);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand img {
+      height: 32px;
+      width: auto;
+    }
+
+    .brand-badge {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      color: #464555;
+      padding-left: 12px;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.875rem;
+      color: #464555;
+      min-width: 0;
+    }
+
+    #userEmail {
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        padding: 12px 16px;
+      }
+
+      #userEmail {
+        display: none;
+      }
+
+      .toolbar-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .toolbar input,
+      .toolbar select,
+      .toolbar input[type="date"] {
+        width: 100%;
+        min-width: 0;
+        flex: 1 1 auto;
+      }
+
+      .toolbar-group {
+        width: 100%;
+      }
+
+      .toolbar .refresh,
+      .toolbar .clear-filters {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .table-wrap.is-loading tbody {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      max-width: min(360px, calc(100vw - 32px));
+      padding: 12px 16px;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      z-index: 100;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .toast-error {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid rgba(185, 28, 28, 0.15);
+    }
+
+    .toast-success {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid rgba(21, 128, 61, 0.15);
+    }
+
+    .stats-hint {
+      font-size: 0.875rem;
+      color: #777587;
+      margin: -8px 0 14px;
+    }
+
+    .logout {
+      border: none;
+      background: #f3f3f5;
+      color: #1a1c1d;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      min-height: 3.25rem;
+      height: 3.25rem;
+      padding: 0 1.25rem;
+      border-radius: 9999px;
+      font-family: Manrope, Inter, system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 0.875rem;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .logout:hover {
+      background: #e8e8ea;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px 24px 64px;
+    }
+
+    h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin: 0 0 0.4rem;
+    }
+
+    .subtitle {
+      color: #464555;
+      font-size: 1rem;
+      margin: 0 0 1.75rem;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat {
+      background: #fff;
+      border: 1px solid rgba(199, 196, 216, 0.22);
+      border-radius: 1rem;
+      padding: 16px 18px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .stat .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 700;
+      color: #777587;
+    }
+
+    .stat .value {
+      font-family: 'Manrope', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-top: 4px;
+      color: #1a1c1d;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #fff;
+      border: 1px solid rgba(199, 196, 216, 0.22);
+      border-radius: 1rem;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .toolbar-row + .toolbar-row {
+      padding-top: 12px;
+      border-top: 1px solid rgba(199, 196, 216, 0.18);
+    }
+
+    .toolbar-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #777587;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar input[type="date"] {
+      min-width: 150px;
+      flex: 0 1 auto;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      padding: 9px 12px;
+      border-radius: 0.65rem;
+      border: 1px solid rgba(199, 196, 216, 0.4);
+      font: inherit;
+      font-size: 0.875rem;
+      outline: none;
+      background: #fbfbfd;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .toolbar input:focus,
+    .toolbar select:focus {
+      border-color: #4d44e3;
+      box-shadow: 0 0 0 3px rgba(77, 68, 227, 0.1);
+      background: #fff;
+    }
+
+    .toolbar input {
+      flex: 1;
+      min-width: 180px;
+    }
+
+    .toolbar .refresh {
+      border: none;
+      background: linear-gradient(135deg, #3525cd 0%, #4f46e5 100%);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      min-height: 3.25rem;
+      height: 3.25rem;
+      padding: 0 1.25rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      line-height: 1.2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toolbar .clear-filters {
+      border: 1px solid rgba(199, 196, 216, 0.45);
+      background: #fff;
+      color: #464555;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      min-height: 3.25rem;
+      height: 3.25rem;
+      padding: 0 1.25rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      line-height: 1.2;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toolbar .clear-filters:hover {
+      background: #f6f7fb;
+    }
+
+    .filter-summary {
+      font-size: 0.875rem;
+      color: #464555;
+      margin: -8px 0 12px;
+    }
+
+    .filter-summary strong {
+      color: #3525cd;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      background: #fff;
+      border: 1px solid rgba(199, 196, 216, 0.22);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.875rem;
+      table-layout: auto;
+    }
+
+    thead {
+      background: #fafafc;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(199, 196, 216, 0.18);
+      vertical-align: top;
+      background-clip: padding-box;
+    }
+
+    th {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #777587;
+      background: #fafafc;
+      white-space: nowrap;
+      border-bottom: 1px solid rgba(199, 196, 216, 0.3);
+    }
+
+    tbody tr {
+      background: #fff;
+    }
+
+    tbody tr:hover {
+      background: #fafbff;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .name {
+      font-weight: 700;
+      color: #1a1c1d;
+    }
+
+    .email {
+      color: #3525cd;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .email:hover {
+      text-decoration: underline;
+    }
+
+    .message-cell {
+      max-width: 380px;
+      min-width: 160px;
+    }
+
+    .message-text {
+      color: #464555;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.875rem;
+      line-height: 1.45;
+    }
+
+    .message-text.is-clamped {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .message-toggle {
+      display: none;
+      margin-top: 6px;
+      padding: 0;
+      border: none;
+      background: none;
+      color: #3525cd;
+      font: inherit;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .message-toggle.is-visible {
+      display: inline-block;
+    }
+
+    .message-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .meta {
+      color: #777587;
+      font-size: 0.875rem;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .status-new {
+      background: rgba(53, 37, 205, 0.1);
+      color: #3525cd;
+    }
+
+    .status-contacted {
+      background: rgba(245, 158, 11, 0.12);
+      color: #b45309;
+    }
+
+    .status-closed {
+      background: rgba(22, 163, 74, 0.1);
+      color: #15803d;
+    }
+
+    th.col-actions,
+    td.col-actions {
+      width: 1%;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .action-group {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(199, 196, 216, 0.45);
+      border-radius: 0.55rem;
+      overflow: hidden;
+      background: #fbfbfd;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+
+    .action-group .status-select {
+      height: 34px;
+      min-width: 112px;
+      padding: 0 28px 0 10px;
+      margin: 0;
+      border: none;
+      border-right: 1px solid rgba(199, 196, 216, 0.35);
+      border-radius: 0;
+      background: transparent;
+      font: inherit;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1a1c1d;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23777587' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+
+    .action-group .status-select:focus {
+      outline: none;
+      background-color: #fff;
+    }
+
+    .action-delete {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      margin: 0;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: #b91c1c;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .action-delete .material-symbols-outlined {
+      font-size: 18px;
+      line-height: 1;
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+
+    .action-delete:hover {
+      background: rgba(186, 26, 26, 0.1);
+      color: #991b1b;
+    }
+
+    .action-delete:focus-visible {
+      outline: 2px solid rgba(186, 26, 26, 0.35);
+      outline-offset: -2px;
+    }
+
+    .empty,
+    .loading,
+    .error {
+      padding: 36px 24px;
+      text-align: center;
+      color: #464555;
+      font-size: 1rem;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    @media (max-width: 900px) {
+      table {
+        min-width: 880px;
+      }
+      .message-cell {
+        max-width: 240px;
+      }
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .admin-tab {
+      border: 1px solid rgba(199, 196, 216, 0.45);
+      background: #fff;
+      color: #464555;
+      padding: 10px 16px;
+      border-radius: 9999px;
+      font-family: Manrope, Inter, system-ui, sans-serif;
+      font-weight: 700;
+      font-size: 0.875rem;
+      line-height: 1.2;
+      cursor: pointer;
+      transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .admin-tab.is-active {
+      background: #3525cd;
+      border-color: #3525cd;
+      color: #fff;
+    }
+
+    .admin-panel[hidden] {
+      display: none !important;
+    }
+
+    .cms-form {
+      display: grid;
+      gap: 16px;
+      max-width: 820px;
+    }
+
+    .cms-intro {
+      margin-bottom: 1.25rem;
+    }
+
+    .cms-intro .subtitle {
+      margin-bottom: 0.75rem;
+    }
+
+    .cms-steps {
+      margin: 0;
+      padding-left: 1.25rem;
+      font-size: 0.875rem;
+      color: #464555;
+      line-height: 1.6;
+    }
+
+    .cms-steps li {
+      margin-bottom: 0.25rem;
+    }
+
+    .cms-toolbar {
+      position: sticky;
+      top: 64px;
+      z-index: 5;
+      display: grid;
+      gap: 10px;
+      padding: 14px 16px;
+      margin: 0 -4px 4px;
+      border: 1px solid rgba(199, 196, 216, 0.35);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(15, 12, 41, 0.06);
+    }
+
+    .cms-toolbar .cms-meta {
+      margin: 0;
+    }
+
+    .cms-section-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .cms-section-nav button {
+      border: 1px solid rgba(199, 196, 216, 0.45);
+      background: #fff;
+      color: #464555;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .cms-section-nav button:hover,
+    .cms-section-nav button:focus-visible {
+      border-color: #3525cd;
+      color: #3525cd;
+      outline: none;
+    }
+
+    .cms-section-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cms-field-search {
+      flex: 1 1 200px;
+      min-width: 0;
+      border: 1px solid rgba(199, 196, 216, 0.45);
+      border-radius: 999px;
+      padding: 0.55rem 1rem;
+      font: inherit;
+      background: #fff;
+    }
+
+    .cms-section-tools button {
+      border: none;
+      background: transparent;
+      color: #3525cd;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 8px;
+    }
+
+    .cms-sections {
+      display: grid;
+      gap: 10px;
+    }
+
+    .cms-section {
+      border: 1px solid rgba(199, 196, 216, 0.35);
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .cms-section > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      font-family: Manrope, Inter, system-ui, sans-serif;
+      user-select: none;
+    }
+
+    .cms-section > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .cms-section > summary::before {
+      content: '▸';
+      color: #3525cd;
+      font-size: 0.875rem;
+      transition: transform 0.15s ease;
+    }
+
+    .cms-section[open] > summary::before {
+      transform: rotate(90deg);
+    }
+
+    .cms-section-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a1c1d;
+    }
+
+    .cms-section-hint {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      flex: 1 1 auto;
+    }
+
+    .cms-section-count {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #3525cd;
+      background: rgba(53, 37, 205, 0.08);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .cms-section-body {
+      padding: 0 16px 16px;
+      display: grid;
+      gap: 14px;
+      border-top: 1px solid rgba(199, 196, 216, 0.25);
+    }
+
+    .cms-section-body .cms-field:first-child {
+      margin-top: 14px;
+    }
+
+    .cms-field.is-hidden {
+      display: none;
+    }
+
+    .cms-section.is-hidden {
+      display: none;
+    }
+
+    .cms-field-hint {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin: -2px 0 6px;
+      line-height: 1.4;
+    }
+
+    .cms-panel-block--collapsible details {
+      border: 1px solid rgba(199, 196, 216, 0.35);
+      border-radius: 12px;
+      background: #fff;
+      padding: 0 14px 14px;
+    }
+
+    .cms-panel-block--collapsible summary {
+      cursor: pointer;
+      font-family: Manrope, Inter, system-ui, sans-serif;
+      font-weight: 700;
+      padding: 14px 0;
+      list-style: none;
+    }
+
+    .cms-panel-block--collapsible summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .cms-panel-block {
+      margin-top: 1.5rem;
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .cms-panel-block h2 {
+      display: none;
+    }
+
+    .cms-field label:not(.cms-file-picker__btn) {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #464555;
+      margin-bottom: 6px;
+    }
+
+    .cms-field input:not([type="file"]):not([type="hidden"]):not([type="color"]),
+    .cms-field textarea {
+      width: 100%;
+      border: 1px solid rgba(199, 196, 216, 0.45);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font: inherit;
+      color: #1a1c1d;
+      background: #fff;
+    }
+
+    .cms-field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .cms-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .cms-meta {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      margin-top: 0.75rem;
+    }
+
+    .cms-editor-footer {
+      font-size: 0.8125rem;
+      color: #4b5563;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(199, 196, 216, 0.35);
+      line-height: 1.5;
+    }
+
+    .cms-editor-footer strong {
+      color: #3525cd;
+      font-weight: 700;
+    }
+
+    .cms-section-title {
+      display: none;
+    }
+
+    .cms-sublabel {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #6b7280;
+      margin: 0.5rem 0 0.35rem;
+    }
+
+    .cms-list-item {
+      border: 1px solid rgba(199, 196, 216, 0.35);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fafbff;
+    }
+
+    .cms-list-item__title {
+      margin: 0 0 8px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #3525cd;
+    }
+
+    .cms-field--nested {
+      margin-bottom: 8px;
+    }
+
+    .cms-page-picker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .cms-page-picker label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #464555;
+    }
+
+    .cms-page-picker select {
+      min-width: 180px;
+      border: 1px solid rgba(199, 196, 216, 0.45);
+      border-radius: 12px;
+      padding: 0.65rem 0.85rem;
+      font: inherit;
+      background: #fff;
+    }
+
+    .cms-page-picker > div label {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .cms-revisions-list,
+    .cms-audit-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cms-revision-item,
+    .cms-audit-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(243, 242, 248, 0.7);
+      font-size: 0.8125rem;
+    }
+
+    .cms-revision-item time,
+    .cms-audit-item time {
+      color: #6b7280;
+    }
+
+    .cms-revision-item button {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: none;
+      background: #3525cd;
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cms-revision-item button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .cms-preview {
+      margin-top: 8px;
+      max-width: 280px;
+      border-radius: 12px;
+      border: 1px solid rgba(199, 196, 216, 0.35);
+    }
+
+    .cms-preview--video {
+      max-width: 360px;
+      width: 100%;
+      background: #0f0f0f;
+    }
+
+    .cms-preview--poster {
+      max-width: 200px;
+    }
+
+    .cms-upload-row {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      margin: 0.5rem 0 0.75rem;
+    }
+
+    .cms-file-picker {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cms-field label.cms-file-picker__btn,
+    .cms-file-picker__btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid #3525cd;
+      background: #3525cd;
+      color: #fff;
+      -webkit-text-fill-color: #fff;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      cursor: pointer;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .cms-file-picker__btn.is-disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .cms-file-picker__input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      cursor: pointer;
+      font-size: 0;
+      background: transparent;
+    }
+
+    .cms-file-picker__input::file-selector-button {
+      display: none;
+    }
+
+    .cms-file-picker__name {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cms-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .cms-upload-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .cms-upload-status {
+      font-size: 0.8125rem;
+      color: #6b7280;
+    }
+
+    .cms-upload-status--error {
+      color: #b91c1c;
+    }
+
+    .cms-icon-reset {
+      margin: 0 0 8px;
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(199, 196, 216, 0.6);
+      background: #fff;
+      color: #464555;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cms-icon-preview {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3f2f8;
+      border: 1px solid rgba(199, 196, 216, 0.35);
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .cms-icon-preview .material-symbols-outlined {
+      font-size: 24px;
+    }
+
+    .cms-icon-preview img {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      display: block;
+      border: 0;
+      outline: none;
+      background: transparent;
+    }
+
+    .cms-launcher {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .cms-launch-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, #f5f3ff 100%);
+      border: 1px solid rgba(53, 37, 205, 0.18);
+      border-radius: 16px;
+      text-decoration: none;
+      color: #1a1c1d;
+      box-shadow: 0 4px 12px rgba(53, 37, 205, 0.06);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .cms-launch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(53, 37, 205, 0.18);
+      border-color: rgba(53, 37, 205, 0.35);
+    }
+
+    .cms-launch-icon {
+      font-size: 36px !important;
+      color: #3525cd;
+      background: rgba(53, 37, 205, 0.08);
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cms-launch-title {
+      display: block;
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: #1a1259;
+    }
+
+    .cms-launch-sub {
+      display: block;
+      font-size: 0.8125rem;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+
+    .cms-launch-cta {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: #3525cd;
+      white-space: nowrap;
+    }
+
+    .cms-tips {
+      background: rgba(243, 242, 248, 0.55);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 0 0 1.5rem;
+      font-size: 0.875rem;
+      color: #464555;
+    }
+
+    .cms-tips strong {
+      display: block;
+      color: #1a1259;
+      margin-bottom: 6px;
+      font-size: 0.9375rem;
+    }
+
+    .cms-tips ul {
+      margin: 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cms-tips kbd {
+      background: #fff;
+      border: 1px solid rgba(199, 196, 216, 0.6);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 0.75rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .cms-advanced {
+      margin-top: 1rem;
+      border: 1px solid rgba(199, 196, 216, 0.4);
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .cms-advanced > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: rgba(243, 242, 248, 0.4);
+    }
+
+    .cms-advanced > summary::-webkit-details-marker { display: none; }
+
+    .cms-advanced > summary::before {
+      content: '▸';
+      display: inline-block;
+      margin-right: 8px;
+      color: #3525cd;
+      transition: transform 0.15s ease;
+    }
+
+    .cms-advanced[open] > summary::before { transform: rotate(90deg); }
+
+    .cms-advanced-title {
+      font-weight: 700;
+      color: #1a1259;
+      font-size: 0.9375rem;
+    }
+
+    .cms-advanced-hint {
+      font-size: 0.8125rem;
+      color: #6b7280;
+    }
+
+    .cms-advanced-body {
+      padding: 16px 18px 20px;
+      border-top: 1px solid rgba(199, 196, 216, 0.35);
+    }
+  </style>
+  <link rel="stylesheet" crossorigin href="/assets/tailwind-Cuw0piSz.css">
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="/assets/logo-C015aalk.png" alt="EasyVariants" />
+      <span class="brand-badge">Admin</span>
+    </div>
+    <div class="user">
+      <span id="userEmail"></span>
+      <button class="logout" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+      <button type="button" class="admin-tab is-active" id="tabLeads" role="tab" aria-selected="true" aria-controls="panelLeads">Leads</button>
+      <button type="button" class="admin-tab" id="tabContent" role="tab" aria-selected="false" aria-controls="panelContent">Content</button>
+    </div>
+
+    <div id="panelLeads" class="admin-panel" role="tabpanel" aria-labelledby="tabLeads">
+    <h1>Contact form leads</h1>
+    <p class="subtitle">Submissions from the EasyVariants contact form.</p>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="label">Total</div><div class="value" id="stat-total"> </div></div>
+      <div class="stat"><div class="label">New</div><div class="value" id="stat-new"> </div></div>
+      <div class="stat"><div class="label">Contacted</div><div class="value" id="stat-contacted"> </div></div>
+      <div class="stat"><div class="label">Closed</div><div class="value" id="stat-closed"> </div></div>
+    </div>
+
+    <p class="stats-hint" id="statsHint">Stat cards show all-time totals. Use the table below for filtered results.</p>
+
+    <div class="toolbar">
+      <div class="toolbar-row">
+        <input type="search" id="searchInput" placeholder="Search by name, email, company, or message" />
+        <select id="statusFilter">
+          <option value="">All statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="closed">Closed</option>
+        </select>
+        <button class="refresh" id="refreshBtn" type="button">
+          <span class="material-symbols-outlined" style="font-size:18px;">refresh</span>
+          Refresh
+        </button>
+      </div>
+      <div class="toolbar-row">
+        <span class="toolbar-label">Date range</span>
+        <div class="toolbar-group">
+          <input type="date" id="dateFrom" aria-label="From date" />
+          <span class="meta">to</span>
+          <input type="date" id="dateTo" aria-label="To date" />
+        </div>
+        <span class="toolbar-label">Sort</span>
+        <div class="toolbar-group">
+          <select id="sortBy" aria-label="Sort by">
+            <option value="createdAt">Received date</option>
+            <option value="firstName">First name</option>
+            <option value="lastName">Last name</option>
+            <option value="email">Email</option>
+            <option value="company">Company</option>
+            <option value="status">Status</option>
+          </select>
+          <select id="sortOrder" aria-label="Sort order">
+            <option value="desc">Newest / Z → A</option>
+            <option value="asc">Oldest / A → Z</option>
+          </select>
+        </div>
+        <button class="clear-filters" id="clearFiltersBtn" type="button">
+          <span class="material-symbols-outlined" style="font-size:18px;">filter_alt_off</span>
+          Clear filters
+        </button>
+      </div>
+    </div>
+    <p class="filter-summary" id="filterSummary" hidden></p>
+
+    <div class="table-wrap" id="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Message</th>
+            <th>Received</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leadsBody">
+          <tr><td colspan="6" class="loading">Loading leads…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+
+    <div id="panelContent" class="admin-panel" role="tabpanel" aria-labelledby="tabContent" hidden>
+      <h1>Website content</h1>
+      <p class="subtitle">Change any heading or line of copy, then publish it live. Colors, fonts, and layout stay the same — only the words (and media) change.</p>
+
+      <div class="cms-launcher">
+        <a class="cms-launch-card" href="/?cms-edit=1" target="_blank" rel="noopener noreferrer">
+          <span class="cms-launch-icon material-symbols-outlined" aria-hidden="true">home</span>
+          <span class="cms-launch-body">
+            <span class="cms-launch-title">Edit Homepage on the live page</span>
+            <span class="cms-launch-sub">Click any line to edit it in place</span>
+          </span>
+          <span class="cms-launch-cta">Open editor →</span>
+        </a>
+        <a class="cms-launch-card" href="/contactus.html?cms-edit=1" target="_blank" rel="noopener noreferrer">
+          <span class="cms-launch-icon material-symbols-outlined" aria-hidden="true">mail</span>
+          <span class="cms-launch-body">
+            <span class="cms-launch-title">Edit Contact page on the live page</span>
+            <span class="cms-launch-sub">Headline, form copy, and more</span>
+          </span>
+          <span class="cms-launch-cta">Open editor →</span>
+        </a>
+      </div>
+
+      <div class="cms-tips">
+        <strong>How it works</strong>
+        <ul>
+          <li>Every heading and line below has its own label. Edit the words, then click <strong>Publish live</strong>.</li>
+          <li>Or open the live site and click any text or image to edit it in place.</li>
+          <li>Use <strong>Save draft</strong> first if you want to preview before visitors see the change.</li>
+        </ul>
+      </div>
+
+      <div class="cms-page-picker">
+        <div>
+          <label for="cmsPageSelect">Page to edit</label>
+          <select id="cmsPageSelect" aria-label="Choose page">
+            <option value="home">Homepage</option>
+            <option value="contact">Contact page</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="cmsEditorHost"></div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/admin/content-editor.js"></script>
+  <script>
+    const token = localStorage.getItem('ev_admin_token');
+    const userEmail = localStorage.getItem('ev_admin_email') || '';
+    if (!token) {
+      window.location.replace('/admin/login.html');
+    }
+    document.getElementById('userEmail').textContent = userEmail;
+
+    function authHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      };
+    }
+
+    async function authFetch(url, options = {}) {
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          ...authHeaders(),
+          ...(options.headers || {}),
+        },
+      });
+      if (res.status === 401) {
+        logout();
+        throw new Error('Session expired. Please log in again.');
+      }
+      return res;
+    }
+
+    function logout() {
+      localStorage.removeItem('ev_admin_token');
+      localStorage.removeItem('ev_admin_email');
+      window.location.replace('/admin/login.html');
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    function fmtDate(iso) {
+      try {
+        const d = new Date(iso);
+        return d.toLocaleString(undefined, {
+          year: 'numeric', month: 'short', day: '2-digit',
+          hour: '2-digit', minute: '2-digit',
+        });
+      } catch { return ''; }
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      })[c]);
+    }
+
+    let allLeads = [];
+    let statsCache = { total: 0, new: 0, contacted: 0, closed: 0 };
+    let toastTimer;
+
+    function showToast(message, type = 'error') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast toast-${type} show`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    function updateStatsDisplay(stats) {
+      statsCache = { ...stats };
+      document.getElementById('stat-total').textContent = stats.total;
+      document.getElementById('stat-new').textContent = stats.new;
+      document.getElementById('stat-contacted').textContent = stats.contacted;
+      document.getElementById('stat-closed').textContent = stats.closed;
+    }
+
+    function updateLeadStatusInRow(id, status) {
+      const lead = allLeads.find((l) => l._id === id);
+      if (!lead || lead.status === status) return;
+
+      const oldStatus = lead.status;
+      lead.status = status;
+
+      if (statsCache[oldStatus] !== undefined) {
+        statsCache[oldStatus] = Math.max(0, statsCache[oldStatus] - 1);
+        statsCache[status] = (statsCache[status] || 0) + 1;
+        updateStatsDisplay(statsCache);
+      }
+    }
+
+    function getFilterParams() {
+      const status = document.getElementById('statusFilter').value;
+      const q = document.getElementById('searchInput').value.trim();
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+      const sortBy = document.getElementById('sortBy').value;
+      const sortOrder = document.getElementById('sortOrder').value;
+
+      if (dateFrom && dateTo && dateFrom > dateTo) {
+        throw new Error('Start date must be on or before end date.');
+      }
+
+      const params = new URLSearchParams();
+      if (status) params.set('status', status);
+      if (q) params.set('q', q);
+      if (dateFrom) params.set('dateFrom', dateFrom);
+      if (dateTo) params.set('dateTo', dateTo);
+      if (sortBy) params.set('sortBy', sortBy);
+      if (sortOrder) params.set('sortOrder', sortOrder);
+      return params;
+    }
+
+    async function loadLeads({ showLoading = true } = {}) {
+      const body = document.getElementById('leadsBody');
+      const tableWrap = document.getElementById('tableWrap');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      if (showLoading && !allLeads.length) {
+        body.innerHTML = `<tr><td colspan="6" class="loading">Loading leads…</td></tr>`;
+      } else if (showLoading) {
+        tableWrap?.classList.add('is-loading');
+        refreshBtn?.setAttribute('disabled', 'true');
+      }
+
+      try {
+        const params = getFilterParams();
+        const res = await fetch(`/api/admin/leads?${params.toString()}`, { headers: authHeaders() });
+        if (res.status === 401) return logout();
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load leads.');
+
+        updateStatsDisplay(data.stats);
+        allLeads = data.leads;
+        updateFilterSummary(data.stats.filtered ?? allLeads.length, data.stats.total, params);
+        renderLeads();
+      } catch (err) {
+        document.getElementById('filterSummary').hidden = true;
+        if (!allLeads.length) {
+          body.innerHTML = `<tr><td colspan="6" class="error">${escapeHtml(err.message)}</td></tr>`;
+        } else {
+          showToast(err.message, 'error');
+        }
+      } finally {
+        tableWrap?.classList.remove('is-loading');
+        refreshBtn?.removeAttribute('disabled');
+      }
+    }
+
+    function renderLeads() {
+      const body = document.getElementById('leadsBody');
+      if (!allLeads.length) {
+        body.innerHTML = `<tr><td colspan="6" class="empty">No leads found.</td></tr>`;
+        return;
+      }
+      body.innerHTML = allLeads.map((l) => `
+        <tr data-id="${l._id}">
+          <td><span class="name">${escapeHtml(l.firstName)} ${escapeHtml(l.lastName)}</span></td>
+          <td><a class="email" href="mailto:${escapeHtml(l.email)}">${escapeHtml(l.email)}</a></td>
+          <td>${escapeHtml(l.company || ' ')}</td>
+          <td class="message-cell">
+            <div class="message-text is-clamped">${escapeHtml(l.message)}</div>
+            <button type="button" class="message-toggle" aria-expanded="false">Read more</button>
+          </td>
+          <td class="meta">${fmtDate(l.createdAt)}</td>
+          <td class="col-actions">
+            <div class="action-group">
+              <select class="status-select status-select--${l.status}" data-id="${l._id}" aria-label="Update lead status">
+                <option value="new" ${l.status === 'new' ? 'selected' : ''}>New</option>
+                <option value="contacted" ${l.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+                <option value="closed" ${l.status === 'closed' ? 'selected' : ''}>Closed</option>
+              </select>
+              <button type="button" class="action-delete" data-id="${l._id}" aria-label="Delete lead" title="Delete lead">
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      initMessageToggles(body);
+
+      body.querySelectorAll('.status-select').forEach((sel) => {
+        let previousValue = sel.value;
+        sel.addEventListener('focus', () => { previousValue = sel.value; });
+        sel.addEventListener('change', async (e) => {
+          const id = e.target.getAttribute('data-id');
+          const status = e.target.value;
+          try {
+            const res = await fetch('/api/admin/leads', {
+              method: 'PATCH',
+              headers: authHeaders(),
+              body: JSON.stringify({ id, status }),
+            });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Update failed.');
+            e.target.classList.remove('status-select--new', 'status-select--contacted', 'status-select--closed');
+            e.target.classList.add(`status-select--${status}`);
+            updateLeadStatusInRow(id, status);
+            previousValue = status;
+          } catch (err) {
+            e.target.value = previousValue;
+            showToast(err.message, 'error');
+          }
+        });
+      });
+
+      body.querySelectorAll('.action-delete').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+          const lead = allLeads.find((l) => l._id === id);
+          if (!confirm('Delete this lead? This cannot be undone.')) return;
+          try {
+            const res = await fetch(`/api/admin/leads?id=${encodeURIComponent(id)}`, {
+              method: 'DELETE',
+              headers: authHeaders(),
+            });
+            if (res.status === 401) return logout();
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Delete failed.');
+
+            if (lead) {
+              statsCache.total = Math.max(0, statsCache.total - 1);
+              statsCache[lead.status] = Math.max(0, (statsCache[lead.status] || 0) - 1);
+              updateStatsDisplay(statsCache);
+            }
+            allLeads = allLeads.filter((l) => l._id !== id);
+            document.querySelector(`tr[data-id="${id}"]`)?.remove();
+            if (!allLeads.length) {
+              body.innerHTML = `<tr><td colspan="6" class="empty">No leads found.</td></tr>`;
+            }
+            const params = getFilterParams();
+            updateFilterSummary(allLeads.length, statsCache.total, params);
+            showToast('Lead deleted.', 'success');
+          } catch (err) {
+            showToast(err.message, 'error');
+          }
+        });
+      });
+    }
+
+    function updateSortOrderLabels() {
+      const sortBy = document.getElementById('sortBy').value;
+      const sortOrder = document.getElementById('sortOrder');
+      if (sortBy === 'createdAt') {
+        sortOrder.options[0].textContent = 'Newest first';
+        sortOrder.options[1].textContent = 'Oldest first';
+      } else {
+        sortOrder.options[0].textContent = 'Descending (Z → A)';
+        sortOrder.options[1].textContent = 'Ascending (A → Z)';
+      }
+    }
+
+    function updateFilterSummary(filteredCount, total, params) {
+      const el = document.getElementById('filterSummary');
+      const status = params.get('status');
+      const q = params.get('q');
+      const dateFrom = params.get('dateFrom');
+      const dateTo = params.get('dateTo');
+      const sortBy = params.get('sortBy') || 'createdAt';
+      const sortOrder = params.get('sortOrder') || 'desc';
+      const parts = [];
+
+      if (status) parts.push(`status: ${status}`);
+      if (q) parts.push(`search: "${q}"`);
+      if (dateFrom || dateTo) {
+        parts.push(`dates: ${dateFrom || '…'} → ${dateTo || '…'}`);
+      }
+
+      const sortLabels = {
+        createdAt: 'Received date',
+        firstName: 'First name',
+        lastName: 'Last name',
+        email: 'Email',
+        company: 'Company',
+        status: 'Status',
+      };
+      const orderLabel = sortBy === 'createdAt'
+        ? (sortOrder === 'asc' ? 'oldest first' : 'newest first')
+        : (sortOrder === 'asc' ? 'A → Z' : 'Z → A');
+      parts.push(`${sortLabels[sortBy] || sortBy}, ${orderLabel}`);
+
+      const hasFilters = status || q || dateFrom || dateTo;
+      const nonDefaultSort = sortBy !== 'createdAt' || sortOrder !== 'desc';
+
+      if (!hasFilters && !nonDefaultSort && filteredCount === total) {
+        el.hidden = true;
+        el.textContent = '';
+        return;
+      }
+
+      el.hidden = false;
+      const countText = filteredCount === total
+        ? `<strong>${filteredCount}</strong> lead${filteredCount === 1 ? '' : 's'}`
+        : `<strong>${filteredCount}</strong> of <strong>${total}</strong> leads`;
+      el.innerHTML = `Showing ${countText} · ${parts.join(' · ')}`;
+    }
+
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value = '';
+      document.getElementById('sortBy').value = 'createdAt';
+      document.getElementById('sortOrder').value = 'desc';
+      loadLeads();
+    }
+
+    function initMessageToggles(root) {
+      root.querySelectorAll('.message-cell').forEach((cell) => {
+        const text = cell.querySelector('.message-text');
+        const btn = cell.querySelector('.message-toggle');
+        if (!text || !btn) return;
+
+        text.classList.add('is-clamped');
+        btn.classList.remove('is-visible');
+        btn.textContent = 'Read more';
+        btn.setAttribute('aria-expanded', 'false');
+
+        if (text.scrollHeight > text.clientHeight + 1) {
+          btn.classList.add('is-visible');
+        }
+
+        btn.addEventListener('click', () => {
+          const expanded = text.classList.toggle('is-clamped') === false;
+          btn.textContent = expanded ? 'Read less' : 'Read more';
+          btn.setAttribute('aria-expanded', String(expanded));
+        });
+      });
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', loadLeads);
+    document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+    document.getElementById('statusFilter').addEventListener('change', loadLeads);
+    document.getElementById('sortBy').addEventListener('change', () => {
+      updateSortOrderLabels();
+      loadLeads();
+    });
+    document.getElementById('sortOrder').addEventListener('change', loadLeads);
+    document.getElementById('dateFrom').addEventListener('change', loadLeads);
+    document.getElementById('dateTo').addEventListener('change', loadLeads);
+    let searchTimer;
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(loadLeads, 300);
+    });
+
+    loadLeads();
+    updateSortOrderLabels();
+
+    /* ═══ CMS · Schema-driven editor (Phase 2) ═══ */
+    const tabLeads = document.getElementById('tabLeads');
+    const tabContent = document.getElementById('tabContent');
+    const panelLeads = document.getElementById('panelLeads');
+    const panelContent = document.getElementById('panelContent');
+
+    function switchAdminTab(name) {
+      const isLeads = name === 'leads';
+      tabLeads.classList.toggle('is-active', isLeads);
+      tabContent.classList.toggle('is-active', !isLeads);
+      tabLeads.setAttribute('aria-selected', String(isLeads));
+      tabContent.setAttribute('aria-selected', String(!isLeads));
+      panelLeads.hidden = !isLeads;
+      panelContent.hidden = isLeads;
+    }
+
+    tabLeads.addEventListener('click', () => switchAdminTab('leads'));
+    tabContent.addEventListener('click', () => switchAdminTab('content'));
+
+    const initialParams = new URLSearchParams(window.location.search);
+    if (initialParams.get('tab') === 'content') {
+      switchAdminTab('content');
+    }
+
+    let cmsSchema = null;
+    let cmsPage = initialParams.get('page') === 'contact' ? 'contact' : 'home';
+    const cmsPageSelect = document.getElementById('cmsPageSelect');
+    if (cmsPageSelect) cmsPageSelect.value = cmsPage;
+
+    function cmsSiteUrl(page, extra = '') {
+      const path = page === 'contact' ? '/contactus.html' : '/';
+      return extra ? `${path}?${extra}` : path;
+    }
+
+    function setCmsMeta(text) {
+      const el = document.getElementById('cmsMeta');
+      if (el) el.textContent = text;
+    }
+
+    async function saveCms(mode) {
+      const form = document.getElementById('cmsEditorForm');
+      if (!form || !cmsSchema?.[cmsPage]) return;
+      const blocks = window.EzCmsEditor.collectBlocksFromForm(form, cmsSchema[cmsPage]);
+      try {
+        const res = await authFetch('/api/admin/content', {
+          method: 'PUT',
+          body: JSON.stringify({ page: cmsPage, blocks, mode }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Save failed.');
+        showToast(
+          mode === 'draft'
+            ? 'Draft saved. Click Publish live to push to visitors.'
+            : 'Published live. Visitors will see the new copy.',
+          'success'
+        );
+        setCmsMeta(
+          mode === 'draft'
+            ? 'Draft saved — publish to make it live.'
+            : 'Published live.'
+        );
+      } catch (err) {
+        showToast(err.message || 'Save failed.', 'error');
+      }
+    }
+
+    async function undoLastCmsPublish(button) {
+      if (button) button.disabled = true;
+      try {
+        const revisionsRes = await authFetch(
+          `/api/admin/content-revisions?page=${encodeURIComponent(cmsPage)}&limit=1`
+        );
+        const revisionsData = await revisionsRes.json();
+        if (!revisionsRes.ok) {
+          throw new Error(revisionsData.error || 'Could not load publish history.');
+        }
+
+        const previous = revisionsData.revisions?.[0];
+        if (!previous) {
+          throw new Error('There is no previous published version to restore.');
+        }
+
+        const savedAt = fmtDate(previous.savedAt);
+        if (!window.confirm(`Restore the version saved before the last publish (${savedAt})?`)) {
+          return;
+        }
+
+        const restoreRes = await authFetch('/api/admin/content-revisions', {
+          method: 'POST',
+          body: JSON.stringify({
+            page: cmsPage,
+            revisionId: previous.id,
+          }),
+        });
+        const restoreData = await restoreRes.json();
+        if (!restoreRes.ok) {
+          throw new Error(restoreData.error || 'Could not restore the previous version.');
+        }
+
+        showToast('Previous published version restored live.', 'success');
+        await loadCmsEditor();
+      } catch (err) {
+        showToast(err.message || 'Could not undo the last publish.', 'error');
+      } finally {
+        if (button?.isConnected) button.disabled = false;
+      }
+    }
+
+    function wireCmsForm(form, meta) {
+      const view = form.querySelector('#cmsViewSiteLink');
+      if (view) view.href = cmsSiteUrl(cmsPage);
+      const preview = form.querySelector('#cmsPreviewDraftLink');
+      if (preview) preview.href = cmsSiteUrl(cmsPage, 'preview=draft');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveCms('publish');
+      });
+      form.querySelector('#cmsDraftBtn')?.addEventListener('click', () => saveCms('draft'));
+      form.querySelector('#cmsReloadBtn')?.addEventListener('click', () => loadCmsEditor());
+      const undoButton = form.querySelector('#cmsUndoPublishBtn');
+      undoButton?.addEventListener('click', () => undoLastCmsPublish(undoButton));
+
+      setCmsMeta(
+        meta?.hasDraft
+          ? 'Draft saved — publish to make it live.'
+          : (meta?.updatedAt ? `Last published ${fmtDate(meta.updatedAt)}.` : 'Edit any heading or line, then publish live.')
+      );
+    }
+
+    async function loadCmsEditor() {
+      const host = document.getElementById('cmsEditorHost');
+      if (!host || !window.EzCmsEditor) return;
+      host.innerHTML = '<p class="cms-meta">Loading content fields…</p>';
+      try {
+        const [schemaRes, contentRes] = await Promise.all([
+          authFetch('/api/admin/content-schema'),
+          authFetch(`/api/admin/content?page=${encodeURIComponent(cmsPage)}&source=draft`),
+        ]);
+        const schemaData = await schemaRes.json();
+        const contentData = await contentRes.json();
+        if (!schemaRes.ok) throw new Error(schemaData.error || 'Failed to load schema.');
+        if (!contentRes.ok) throw new Error(contentData.error || 'Failed to load content.');
+        cmsSchema = schemaData.schema;
+        const form = window.EzCmsEditor.renderEditor(host, cmsPage, cmsSchema, contentData.blocks || {});
+        wireCmsForm(form, contentData);
+      } catch (err) {
+        host.innerHTML = `<p class="cms-meta">${escapeHtml(err.message || 'Failed to load content.')}</p>`;
+        showToast(err.message || 'Failed to load content.', 'error');
+      }
+    }
+
+    cmsPageSelect?.addEventListener('change', () => {
+      cmsPage = cmsPageSelect.value;
+      loadCmsEditor();
+    });
+
+    loadCmsEditor();
+  </script>
+</body>
+
+</html>

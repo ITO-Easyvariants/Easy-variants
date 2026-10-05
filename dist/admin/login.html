@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Admin Login &middot; EasyVariants</title>
+  <link rel="icon" type="image/png" href="/images/EV logo.png" />
+  <link rel="apple-touch-icon" href="/images/EV logo.png" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <script>
+    if (localStorage.getItem('ev_admin_token')) {
+      window.location.replace('/admin/dashboard.html');
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #1a1c1d;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(53, 37, 205, 0.08), transparent),
+        linear-gradient(180deg, #f8f8fc 0%, #eef0f6 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      border-radius: 1.5rem;
+      padding: 2.5rem;
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.02),
+        0 24px 64px rgba(53, 37, 205, 0.10);
+      border: 1px solid rgba(199, 196, 216, 0.18);
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .login-logo img {
+      height: 38px;
+      width: auto;
+    }
+
+    .login-logo .badge {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
+      text-transform: none;
+      color: #464555;
+      padding-left: 12px;
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+    }
+
+    p.subtitle {
+      margin: 0 0 1.75rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 0.85rem;
+      border: 1px solid rgba(199, 196, 216, 0.35);
+      background: #fbfbfd;
+      font: inherit;
+      color: #1a1c1d;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus {
+      border-color: #4d44e3;
+      box-shadow: 0 0 0 3px rgba(77, 68, 227, 0.12);
+      background: #fff;
+    }
+
+    .field + .field {
+      margin-top: 1rem;
+    }
+
+    .submit {
+      margin-top: 1.5rem;
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      min-height: 3.25rem;
+      height: 3.25rem;
+      padding: 0 1.25rem;
+      border: none;
+      border-radius: 9999px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1.2;
+      color: #fff;
+      background: linear-gradient(135deg, #3525cd 0%, #4f46e5 100%);
+      cursor: pointer;
+      box-shadow: 0 10px 32px rgba(53, 37, 205, 0.32);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 40px rgba(53, 37, 205, 0.38);
+    }
+
+    .submit:active {
+      transform: scale(0.98);
+    }
+
+    .submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .error {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      background: rgba(186, 26, 26, 0.08);
+      color: #b91c1c;
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 1.25rem;
+      font-size: 0.875rem;
+      color: #464555;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back:hover {
+      color: #1a1c1d;
+    }
+  </style>
+  <link rel="stylesheet" crossorigin href="/assets/tailwind-Cuw0piSz.css">
+</head>
+
+<body>
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="/assets/logo-C015aalk.png" alt="EasyVariants" />
+      <span class="badge">Admin</span>
+    </div>
+
+    <h1 class="ez-h3">Welcome back.</h1>
+    <p class="subtitle ez-p2">Sign in to view contact form leads.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label class="ez-h6 text-on-surface-variant" for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email" required placeholder="admin@easyvariants.com" />
+      </div>
+      <div class="field">
+        <label class="ez-h6 text-on-surface-variant" for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required placeholder="Enter your password" />
+      </div>
+      <button type="submit" class="submit" id="submitBtn">Sign in</button>
+      <div class="error" id="errorBox" role="alert" aria-live="polite"></div>
+    </form>
+
+    <a href="../index.html" class="back ez-p3 font-semibold">
+      <span class="material-symbols-outlined" style="font-size:16px;">arrow_back</span>
+      Back to site
+    </a>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const errorBox = document.getElementById('errorBox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Redirect handled in head if already logged in
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove('show');
+      errorBox.textContent = '';
+      submitBtn.disabled = true;
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Signing in...';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || 'Login failed.');
+        }
+        localStorage.setItem('ev_admin_token', data.token);
+        localStorage.setItem('ev_admin_email', email);
+        window.location.replace('/admin/dashboard.html');
+      } catch (err) {
+        errorBox.textContent = err.message || 'Login failed.';
+        errorBox.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+  </script>
+</body>
+
+</html>

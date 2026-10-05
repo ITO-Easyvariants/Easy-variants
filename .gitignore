@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# Local CMS uploads (dev fallback when Cloudflare R2 env vars are unset)
+public/uploads/cms/*
+!public/uploads/cms/.gitkeep
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

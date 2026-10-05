@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>EasyVariants | Contact Us — Apparel & Headwear Artwork and Tech Pack Automation</title>
+  <meta name="description" content="EasyVariants is an Adobe Illustrator solution that automates artwork and tech pack creation for apparel and headwear. Generate product variants, colorways, logos, and production-ready artwork faster and more efficiently.">
+  <meta name="keywords" content="EasyVariants, Easy Variants, apparel artwork automation, headwear artwork automation, Adobe Illustrator plugin, Illustrator plugin for apparel, tech pack automation, tech pack generator, apparel tech pack, headwear tech pack, colorway generator, colorway automation, artwork variant generator, product variant automation, logo placement automation, apparel product development, headwear product development, production artwork, design automation">
+  <link rel="icon" type="image/png" href="/images/EV logo.png" />
+  <link rel="apple-touch-icon" href="/images/EV logo.png" />
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <style>
+    html {
+      scroll-behavior: auto;
+    }
+
+    body {
+      background-color: #f8f8fc;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(53, 37, 205, 0.04), transparent),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: no-repeat, repeat;
+      background-size: 100% 800px, 100px 100px;
+    }
+
+    /* Pill + icon buttons: see tailwind.css (.ev-pill-btn, .ez-icon-btn) */
+
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(28px) saturate(1.6);
+      -webkit-backdrop-filter: blur(28px) saturate(1.6);
+      border: 0.5px solid rgba(199, 196, 216, 0.18);
+    }
+
+    .brand-logo-img {
+      width: auto;
+      object-fit: contain;
+      object-position: left center;
+      filter: brightness(1.06) contrast(1.14);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px) translateZ(0);
+      will-change: transform, opacity;
+      transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+      backface-visibility: hidden;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal.is-revealed {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+    }
+
+    .card-premium {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(199, 196, 216, 0.12);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 32px rgba(53, 37, 205, 0.04);
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .card-signature {
+      background: linear-gradient(135deg, rgba(226, 223, 255, 0.4), rgba(255, 255, 255, 0.85)) !important;
+    }
+
+    .card-premium:hover {
+      border-color: rgba(53, 37, 205, 0.25);
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 0 20px 48px rgba(53, 37, 205, 0.08), 0 10px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .gradient-sep {
+      display: none !important;
+    }
+
+    .footer-premium {
+      background: linear-gradient(180deg, #f8f8fc 0%, #f0f0f4 100%);
+    }
+
+    .footer-premium a {
+      transition: color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .footer-mini-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-radius: 1.25rem;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(199, 196, 216, 0.18);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 6px 20px rgba(53, 37, 205, 0.04);
+    }
+
+    .footer-mini-card__icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 0.875rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(53, 37, 205, 0.06);
+      border: 1px solid rgba(53, 37, 205, 0.1);
+      color: #3525cd;
+    }
+
+    .footer-mini-card__icon .cms-icon-svg,
+    .footer-mini-card__icon .cms-icon-img {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .footer-mini-card__title {
+      font-family: Manrope, Inter, system-ui, sans-serif;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #1a1c1d;
+      margin-bottom: 0.25rem;
+      line-height: 1.3;
+    }
+
+    .footer-mini-card__text {
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: #464555;
+      margin: 0;
+    }
+
+    .footer-link-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .footer-link-col a {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1c1d;
+      text-decoration: none;
+    }
+
+    .footer-link-col a:hover {
+      color: #3525cd;
+    }
+
+    .footer-divider {
+      height: 1px;
+      background: rgba(199, 196, 216, 0.35);
+      margin: 2.5rem 0 1.25rem;
+    }
+
+    .hover-lift {
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 64px rgba(53, 37, 205, 0.10), 0 8px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    body.mobile-menu-open {
+      overflow: hidden;
+    }
+
+    .mobile-menu-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 45;
+      background: rgba(26, 28, 29, 0.45);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    .mobile-menu-backdrop.active {
+      display: block;
+    }
+
+    .mobile-menu-light {
+      display: none;
+    }
+
+    .mobile-menu-light.active {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 4.5rem;
+      left: 0;
+      right: 0;
+      max-height: calc(100vh - 4.5rem);
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      z-index: 50;
+      padding: 0 20px 24px;
+      border-bottom: 1px solid rgba(199, 196, 216, 0.25);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-menu-light__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0 12px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(199, 196, 216, 0.2);
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.98);
+      z-index: 1;
+    }
+
+    .mobile-menu-light__title {
+      font-family: Manrope, Inter, sans-serif;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #464555;
+    }
+
+    .mobile-menu-light__close {
+      border: none;
+      background: #f3f3f5;
+      color: #1a1c1d;
+    }
+
+    .mobile-menu-light__close:hover {
+      background: #e8e8ea;
+    }
+
+    .mobile-menu-light a {
+      padding: 14px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a1c1d;
+      border-bottom: 1px solid rgba(199, 196, 216, 0.12);
+      text-decoration: none;
+    }
+
+    .menu-toggle-light {
+      position: relative;
+      z-index: 60;
+      display: none;
+      flex-shrink: 0;
+      border: none;
+      background: #f3f3f5;
+      color: #1a1c1d;
+    }
+
+    .menu-toggle-light:hover {
+      background: #e8e8ea;
+    }
+
+    .menu-toggle-light:active {
+      transform: scale(0.95);
+    }
+
+    .menu-toggle-light__icon {
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    body.mobile-menu-open .menu-toggle-light {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    @media (max-width: 1023px) {
+      .menu-toggle-light {
+        display: flex !important;
+      }
+    }
+
+    @media (max-width: 767px) {
+      main .ez-section-header {
+        margin-bottom: 0;
+      }
+    }
+
+    @media (min-width: 640px) and (max-width: 1023px) {
+      .contact-form-grid {
+        gap: 2rem;
+      }
+    }
+
+    main {
+      overflow-x: clip;
+    }
+
+    /* ═══ CONTACT FORM ═══ */
+    .contact-input {
+      width: 100%;
+      padding: 0.875rem 1.125rem;
+      border-radius: 0.875rem;
+      border: 1px solid rgba(199, 196, 216, 0.25);
+      background: rgba(255, 255, 255, 0.9);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: #1a1c1d;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .contact-input:focus {
+      border-color: #4d44e3;
+      box-shadow: 0 0 0 3px rgba(77, 68, 227, 0.08);
+    }
+
+    .contact-input::placeholder {
+      color: #777587;
+    }
+
+    textarea.contact-input {
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    .contact-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #464555;
+      margin-bottom: 0.5rem;
+    }
+
+    .success-msg,
+    .error-msg {
+      display: none;
+      padding: 1rem 1.5rem;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-top: 1rem;
+    }
+
+    .success-msg {
+      background: rgba(34, 197, 94, 0.08);
+      color: #16a34a;
+      border: 1px solid rgba(34, 197, 94, 0.15);
+    }
+
+    .error-msg {
+      background: rgba(186, 26, 26, 0.06);
+      color: #ba1a1a;
+      border: 1px solid rgba(186, 26, 26, 0.12);
+    }
+
+    .success-msg.show,
+    .error-msg.show {
+      display: block;
+    }
+
+    /* Info card icons */
+    .info-icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    html,
+    body {
+      overflow-x: hidden;
+    }
+
+    @media (max-width: 639px) {
+      .brand-logo-img {
+        height: 3rem !important;
+        max-width: min(100vw - 5rem, 180px) !important;
+      }
+
+      .ev-pill-btn--lg {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+  <link rel="stylesheet" crossorigin href="/assets/tailwind-Cuw0piSz.css">
+</head>
+
+<body class="font-body text-on-surface antialiased" data-cms-page="contact">
+
+  <!-- ═══════════════ NAVBAR ═══════════════ -->
+  <nav class="glass-panel fixed top-0 left-0 w-full z-50 shadow-sm overflow-visible">
+    <div class="ez-page-shell flex items-center justify-between py-0.5 md:py-1">
+      <!-- Left: Logo -->
+      <div class="flex-1 flex justify-start min-w-0">
+        <a href="index.html" class="flex items-center shrink-0">
+          <img src="/assets/logo-C015aalk.png" alt="EasyVariants"
+            class="brand-logo-img h-14 w-auto max-w-[min(100vw-8rem,220px)] sm:h-16 md:h-16" />
+        </a>
+      </div>
+
+      <!-- Center: Links -->
+      <div class="hidden lg:flex items-center justify-center gap-6 xl:gap-10">
+        <a class="ez-nav-link" href="index.html#home"><span data-cms-page="home" data-cms-key="header.nav.0.label">Home</span></a>
+        <a class="ez-nav-link" href="index.html#solution"><span data-cms-page="home" data-cms-key="header.nav.1.label">Our Solution</span></a>
+        <a class="ez-nav-link" href="index.html#how-it-works"><span data-cms-page="home" data-cms-key="header.nav.2.label">Workflow</span></a>
+        <a class="ez-nav-link" href="index.html#demos"><span data-cms-page="home" data-cms-key="header.nav.3.label">Demo Videos</span></a>
+      </div>
+
+      <!-- Right: CTA -->
+      <div class="flex-1 hidden lg:flex items-center justify-end gap-6">
+        <a href="contactus.html" class="ev-pill-btn ev-pill-btn--sm" data-cms-page="home" data-cms-key="header.cta.href">
+          <span data-cms-page="home" data-cms-key="header.cta.label">Get Your Demo Today</span>
+        </a>
+      </div>
+
+      <!-- Mobile: Toggle -->
+      <button type="button" id="mobileMenuToggle" class="menu-toggle-light ez-icon-btn"
+        aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <span class="material-symbols-outlined menu-toggle-light__icon">menu</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenuBackdrop" class="mobile-menu-backdrop" aria-hidden="true"></div>
+  <div id="mobileMenu" class="mobile-menu-light" role="dialog" aria-modal="true" aria-label="Navigation menu"
+    aria-hidden="true">
+    <div class="mobile-menu-light__header">
+      <span class="mobile-menu-light__title" data-cms-page="home" data-cms-key="header.mobileTitle">Menu</span>
+      <button type="button" id="mobileMenuClose" class="mobile-menu-light__close ez-icon-btn" aria-label="Close menu">
+        <span class="material-symbols-outlined text-xl">close</span>
+      </button>
+    </div>
+    <a href="index.html#home"><span data-cms-page="home" data-cms-key="header.nav.0.label">Home</span></a>
+    <a href="index.html#solution"><span data-cms-page="home" data-cms-key="header.nav.1.label">Our Solution</span></a>
+    <a href="index.html#how-it-works"><span data-cms-page="home" data-cms-key="header.nav.2.label">Workflow</span></a>
+    <a href="index.html#demos"><span data-cms-page="home" data-cms-key="header.nav.3.label">Demo Videos</span></a>
+    <a href="contactus.html" class="ev-pill-btn ev-pill-btn--sm" data-cms-page="home" data-cms-key="header.cta.href">
+      <span data-cms-page="home" data-cms-key="header.cta.label">Get Your Demo Today</span>
+    </a>
+  </div>
+
+  <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+  <main class="pt-20 sm:pt-24 lg:pt-28 pb-14 md:pb-20 lg:pb-28 overflow-x-hidden">
+    <div class="ez-page-shell">
+      <div class="flex flex-col gap-12 md:gap-16 lg:gap-20">
+
+      <!-- HERO HEADER -->
+      <section class="mb-0 reveal">
+        <div class="ez-section-header mb-0">
+          <div class="ez-page-badge mb-6">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            <span class="ez-page-badge-text" data-cms-key="contact.badge">Request a Demo</span>
+          </div>
+          <h1 class="ez-page-title mb-5">
+            <span data-cms-key="contact.title.line1">Let's Build</span><br />
+            <span class="text-on-surface" data-cms-key="contact.title.line2">Something Great</span>
+          </h1>
+          <p class="ez-section-desc" data-cms-key="contact.description">
+            See how EasyVariants can automate your design workflow, save time, and scale your product variants
+            effortlessly.
+          </p>
+        </div>
+      </section>
+
+      <!-- CONTACT SPLIT: FORM + INFO -->
+      <section class="contact-form-grid mb-0 grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-10 reveal" style="transition-delay: 0.15s;">
+        <!-- LEFT: FORM CARD -->
+        <div class="lg:col-span-3 card-premium card-signature rounded-2xl sm:rounded-[2rem] p-6 sm:p-8 md:p-10 lg:p-14 hover-lift">
+          <h2 class="ez-subsection-title mb-2" data-cms-key="contact.form.title">Send us a message</h2>
+          <p class="ez-p2 mb-8" data-cms-key="contact.form.subtitle">Fill out the form and our team will get back to you within 24
+            hours.</p>
+
+          <form id="contactForm" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label class="contact-label" for="firstName" data-cms-key="contact.form.firstName.label">First Name</label>
+                <input type="text" id="firstName" name="firstName" class="contact-input" placeholder="John" required data-cms-key="contact.form.firstName.placeholder" />
+              </div>
+              <div>
+                <label class="contact-label" for="lastName" data-cms-key="contact.form.lastName.label">Last Name</label>
+                <input type="text" id="lastName" name="lastName" class="contact-input" placeholder="Doe" required data-cms-key="contact.form.lastName.placeholder" />
+              </div>
+            </div>
+
+            <div>
+              <label class="contact-label" for="email" data-cms-key="contact.form.email.label">Email Address</label>
+              <input type="email" id="email" name="email" class="contact-input" placeholder="john@company.com"
+                required data-cms-key="contact.form.email.placeholder" />
+            </div>
+
+            <div>
+              <label class="contact-label" for="company" data-cms-key="contact.form.company.label">Company (Optional)</label>
+              <input type="text" id="company" name="company" class="contact-input" placeholder="Acme Corp" data-cms-key="contact.form.company.placeholder" />
+            </div>
+
+            <div>
+              <label class="contact-label" for="message" data-cms-key="contact.form.message.label">Message</label>
+              <textarea id="message" name="message" class="contact-input"
+                placeholder="Tell us about your project or how we can help..." required data-cms-key="contact.form.message.placeholder"></textarea>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="submit-btn ev-pill-btn ev-pill-btn--lg w-full md:w-auto">
+                <span data-cms-key="contact.form.submit">Send Message</span>
+                <span class="material-symbols-outlined text-base ml-2 align-middle"
+                  style="font-size: 18px;">arrow_forward</span>
+              </button>
+            </div>
+
+            <div class="success-msg" id="successMsg" role="status" aria-live="polite">
+              <span class="material-symbols-outlined text-base mr-2 align-middle">check_circle</span>
+              <span data-cms-key="contact.form.success">Message sent successfully! We'll be in touch soon.</span>
+            </div>
+            <div class="error-msg" id="errorMsg" role="alert" aria-live="assertive">
+              <span class="material-symbols-outlined text-base mr-2 align-middle">error</span>
+              <span id="errorMsgText" data-cms-key="contact.form.error">Something went wrong. Please try again.</span>
+            </div>
+          </form>
+        </div>
+
+        <!-- RIGHT: INFO SIDEBAR -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+          <!-- Info Card 1 -->
+          <div class="card-premium rounded-[2rem] p-6 md:p-8 hover-lift group">
+            <div class="flex items-start gap-4">
+              <div class="info-icon-wrap bg-primary/5 border border-primary/10" data-cms-key="contact.info.0.icon" data-cms-icon data-cms-icon-name="mail">
+                <span class="material-symbols-outlined text-primary text-xl">mail</span>
+              </div>
+              <div>
+                <h3 class="ez-card-title--sm mb-1" data-cms-key="contact.info.0.title">Email Us</h3>
+                <p class="ez-p2" data-cms-key="contact.info.0.description">hello@easyvariants.com</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Card 2 -->
+          <div class="card-premium rounded-[2rem] p-6 md:p-8 hover-lift group">
+            <div class="flex items-start gap-4">
+              <div class="info-icon-wrap bg-primary/5 border border-primary/10" data-cms-key="contact.info.1.icon" data-cms-icon data-cms-icon-name="schedule">
+                <span class="material-symbols-outlined text-primary text-xl">schedule</span>
+              </div>
+              <div>
+                <h3 class="ez-card-title--sm mb-1" data-cms-key="contact.info.1.title">Response Time</h3>
+                <p class="ez-p2" data-cms-key="contact.info.1.description">We typically respond within 24 hours on
+                  business days.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Card 3 -->
+          <div class="card-premium rounded-[2rem] p-8 hover-lift group">
+            <div class="flex items-start gap-4">
+              <div class="info-icon-wrap bg-primary/5 border border-primary/10" data-cms-key="contact.info.2.icon" data-cms-icon data-cms-icon-name="devices">
+                <span class="material-symbols-outlined text-primary text-xl">devices</span>
+              </div>
+              <div>
+                <h3 class="ez-card-title--sm mb-1" data-cms-key="contact.info.2.title">Live Demo</h3>
+                <p class="ez-p2" data-cms-key="contact.info.2.description">Get a personalized walkthrough of the
+                  platform, tailored to your use case.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info Card 4 -->
+          <div class="card-premium rounded-[2rem] p-8 hover-lift group">
+            <div class="flex items-start gap-4">
+              <div class="info-icon-wrap bg-primary/5 border border-primary/10" data-cms-key="contact.info.3.icon" data-cms-icon data-cms-icon-name="support_agent">
+                <span class="material-symbols-outlined text-primary text-xl">support_agent</span>
+              </div>
+              <div>
+                <h3 class="ez-card-title--sm mb-1" data-cms-key="contact.info.3.title">Dedicated Support</h3>
+                <p class="ez-p2" data-cms-key="contact.info.3.description">Our team is here to help you every step of
+                  the way.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Stats -->
+          <div class="card-premium rounded-[2rem] p-8 text-center">
+            <div class="flex items-center justify-center gap-8">
+              <div>
+                <div class="ez-stat-value" data-cms-key="contact.stats.0.value">500+</div>
+                <div class="ez-h6 text-on-surface-variant mt-1" data-cms-key="contact.stats.0.label">Teams
+                  Served</div>
+              </div>
+              <div class="w-px h-10 bg-outline-variant/20"></div>
+              <div>
+                <div class="ez-stat-value" data-cms-key="contact.stats.1.value">24hr</div>
+                <div class="ez-h6 text-on-surface-variant mt-1" data-cms-key="contact.stats.1.label">Avg Reply
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer class="footer-premium w-full pt-16 pb-10 md:pt-20 md:pb-12 mt-10">
+    <div class="ez-page-shell">
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 gap-10 xl:gap-8 mb-0">
+
+              <!-- Brand -->
+              <div class="xl:col-span-4 flex flex-col gap-5">
+                  <img src="/assets/logo-C015aalk.png" alt="EasyVariants"
+                    class="brand-logo-img h-20 w-auto max-w-[min(100%,280px)] sm:h-24 object-contain self-start" />
+                  <p class="ez-p2 text-on-surface font-semibold max-w-md" data-cms-page="home" data-cms-key="footer.brand.description">
+                      Enterprise design automation for large manufacturers. Scale product variants across global
+                      operations with controlled, repeatable workflows.
+                  </p>
+              </div>
+
+              <!-- Menu -->
+              <div class="xl:col-span-2 footer-link-col">
+                  <h4 class="ez-footer-title mb-1" data-cms-page="home" data-cms-key="footer.menuTitle">Menu</h4>
+                  <a href="index.html#home"><span data-cms-page="home" data-cms-key="footer.menu.0.label">Home</span></a>
+                  <a href="index.html#solution"><span data-cms-page="home" data-cms-key="footer.menu.1.label">Our Solution</span></a>
+                  <a href="index.html#how-it-works"><span data-cms-page="home" data-cms-key="footer.menu.2.label">Workflow</span></a>
+                  <a href="index.html#demos"><span data-cms-page="home" data-cms-key="footer.menu.3.label">Demo Videos</span></a>
+              </div>
+
+              <!-- Quick Links -->
+              <div class="xl:col-span-2 footer-link-col">
+                  <h4 class="ez-footer-title mb-1" data-cms-page="home" data-cms-key="footer.socialTitle">Quick Links</h4>
+                  <a href="https://www.linkedin.com/company/xinthe-technologies/" target="_blank" rel="noopener noreferrer" data-cms-page="home" data-cms-key="footer.social.0.href"><span data-cms-page="home" data-cms-key="footer.social.0.label">LinkedIn</span></a>
+                  <a href="https://www.youtube.com/@xinthetechnologies6321" target="_blank" rel="noopener noreferrer" data-cms-page="home" data-cms-key="footer.social.1.href"><span data-cms-page="home" data-cms-key="footer.social.1.label">Youtube</span></a>
+                  <a href="https://facebook.com/xintheemployees" target="_blank" rel="noopener noreferrer" data-cms-page="home" data-cms-key="footer.social.2.href"><span data-cms-page="home" data-cms-key="footer.social.2.label">facebook</span></a>
+                  <a href="https://x.com/xinthetech" target="_blank" rel="noopener noreferrer" data-cms-page="home" data-cms-key="footer.social.3.href"><span data-cms-page="home" data-cms-key="footer.social.3.label">X</span></a>
+              </div>
+
+              <!-- Mini cards -->
+              <div class="xl:col-span-4 flex flex-col gap-4">
+                  <div class="footer-mini-card">
+                      <div class="footer-mini-card__icon" data-cms-page="home" data-cms-key="footer.email.icon" data-cms-icon data-cms-icon-name="mail" data-cms-icon-tint>
+                          <span class="material-symbols-outlined text-primary text-xl">mail</span>
+                      </div>
+                      <div>
+                          <p class="footer-mini-card__title" data-cms-page="home" data-cms-key="footer.email.title">Email Us</p>
+                          <p class="footer-mini-card__text">
+                              <a href="mailto:hello@easyvariants.com" class="hover:text-primary transition-colors" data-cms-page="home" data-cms-key="footer.email.href"><span data-cms-page="home" data-cms-key="footer.email.address">hello@easyvariants.com</span></a>
+                          </p>
+                      </div>
+                  </div>
+                  <div class="footer-mini-card">
+                      <div class="footer-mini-card__icon" data-cms-page="home" data-cms-key="footer.support.icon" data-cms-icon data-cms-icon-name="support_agent" data-cms-icon-tint>
+                          <span class="material-symbols-outlined text-primary text-xl">support_agent</span>
+                      </div>
+                      <div>
+                          <p class="footer-mini-card__title" data-cms-page="home" data-cms-key="footer.support.title">Dedicated Support</p>
+                          <p class="footer-mini-card__text" data-cms-page="home" data-cms-key="footer.support.text">Our team is here to help you every step of the way.</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="footer-divider"></div>
+
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+              <p class="ez-p3-legal" data-cms-page="home" data-cms-key="footer.copyright">© 2026 EasyVariants. All Rights Reserved.</p>
+              <p class="ez-p3-legal" data-cms-page="home" data-cms-key="footer.disclaimer">
+                  Adobe Illustrator® is a trademark of Adobe Inc. EasyVariants is not affiliated.
+              </p>
+          </div>
+      </div>
+  </footer>
+
+  <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      (function initMobileMenu() {
+        const menu = document.getElementById("mobileMenu");
+        const backdrop = document.getElementById("mobileMenuBackdrop");
+        const toggle = document.getElementById("mobileMenuToggle");
+        const closeBtn = document.getElementById("mobileMenuClose");
+        if (!menu || !toggle) return;
+
+        const setOpen = (open) => {
+          menu.classList.toggle("active", open);
+          backdrop?.classList.toggle("active", open);
+          toggle.classList.toggle("is-open", open);
+          toggle.setAttribute("aria-expanded", String(open));
+          toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+          menu.setAttribute("aria-hidden", String(!open));
+          backdrop?.setAttribute("aria-hidden", String(!open));
+          document.body.classList.toggle("mobile-menu-open", open);
+        };
+
+        toggle.addEventListener("click", () => setOpen(!menu.classList.contains("active")));
+        closeBtn?.addEventListener("click", () => setOpen(false));
+        backdrop?.addEventListener("click", () => setOpen(false));
+        menu.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => setOpen(false));
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && menu.classList.contains("active")) setOpen(false);
+        });
+      })();
+
+      // Scroll Reveal
+      const revealInView = (el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
+          el.classList.add("is-revealed");
+        }
+      };
+      const revealEls = document.querySelectorAll(".reveal");
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-revealed");
+          }
+        });
+      }, { threshold: 0.05, rootMargin: "0px 0px -40px 0px" });
+      revealEls.forEach(el => {
+        revealInView(el);
+        revealObserver.observe(el);
+      });
+      window.addEventListener("load", () => {
+        revealEls.forEach(revealInView);
+      }, { once: true });
+
+      // Contact Form
+      const form = document.getElementById('contactForm');
+      const successMsg = document.getElementById('successMsg');
+      const errorMsg = document.getElementById('errorMsg');
+      const errorMsgText = document.getElementById('errorMsgText');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        successMsg.classList.remove('show');
+        errorMsg.classList.remove('show');
+
+        const btn = form.querySelector('.submit-btn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span class="material-symbols-outlined text-base animate-spin mr-2 align-middle" style="font-size:18px;">progress_activity</span> Sending...';
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+
+        const payload = {
+          firstName: document.getElementById('firstName').value.trim(),
+          lastName: document.getElementById('lastName').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          company: document.getElementById('company').value.trim(),
+          message: document.getElementById('message').value.trim(),
+        };
+
+        try {
+          const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || 'Could not send your message.');
+
+          successMsg.classList.add('show');
+          form.reset();
+          setTimeout(() => successMsg.classList.remove('show'), 5000);
+        } catch (err) {
+          errorMsgText.textContent = err.message || 'Something went wrong. Please try again.';
+          errorMsg.classList.add('show');
+          setTimeout(() => errorMsg.classList.remove('show'), 6000);
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
+      });
+    });
+  </script>
+
+  <script src="/cms-loader.js" defer></script>
+  <script src="/cms-inline-edit.js" defer></script>
+
+</body>
+
+</html>
