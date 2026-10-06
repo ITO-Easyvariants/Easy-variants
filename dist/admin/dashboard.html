@@ -13,7 +13,8 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
     rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-    rel="stylesheet" />
+    rel="stylesheet" />
+
   <style>
     .material-symbols-outlined {
       font-family: 'Material Symbols Outlined';
@@ -1021,7 +1022,13 @@
     .cms-preview--video {
       max-width: 360px;
       width: 100%;
+      aspect-ratio: 16 / 9;
       background: #0f0f0f;
+    }
+
+    iframe.cms-preview--video {
+      display: block;
+      border: 0;
     }
 
     .cms-preview--poster {
@@ -1114,6 +1121,19 @@
 
     .cms-upload-status--error {
       color: #b91c1c;
+    }
+
+    .cms-url-control {
+      width: min(100%, 560px);
+      margin: 0 0 0.75rem;
+    }
+
+    .cms-url-control .cms-sublabel {
+      margin-bottom: 6px;
+    }
+
+    .cms-field .cms-url-control__input {
+      width: 100%;
     }
 
     .cms-icon-reset {

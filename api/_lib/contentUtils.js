@@ -55,10 +55,26 @@ function validateListItems(page, key, value) {
     const out = {};
     for (const sub of fieldDef.itemFields) {
       const raw = item[sub.key];
-      if (!isNonEmptyString(raw, sub.type === 'text' ? 500 : TEXT_MAX)) {
+      const maxLen =
+        sub.key === 'src' || sub.key === 'poster' || sub.type === 'video' ? URL_MAX : 500;
+      if (sub.optional) {
+        if (raw === undefined || raw === null || String(raw).trim() === '') {
+          out[sub.key] = '';
+          continue;
+        }
+        if (typeof raw !== 'string' || raw.length > maxLen) {
+          return { ok: false, error: `List "${key}" item ${i + 1}: "${sub.label}" is invalid.` };
+        }
+        out[sub.key] = String(raw).trim();
+        continue;
+      }
+      // Accept legacy youtubeId when src is missing (demos.videos migration).
+      const legacy =
+        sub.key === 'src' && !raw && typeof item.youtubeId === 'string' ? item.youtubeId : raw;
+      if (!isNonEmptyString(legacy, maxLen)) {
         return { ok: false, error: `List "${key}" item ${i + 1}: "${sub.label}" is required.` };
       }
-      out[sub.key] = String(raw).trim();
+      out[sub.key] = String(legacy).trim();
     }
     normalized.push(out);
   }

@@ -5,7 +5,7 @@ HTML markers: `data-cms-key="…"` on `index.html` / `contactus.html` (`data-cms
 
 **Link keys:** keys ending in `.href` are placed on `<a>` elements; the loader sets the `href` attribute (not text content). Pair with a `.label` key on a child `<span>` where needed.
 
-**Demo videos list:** `demos.videos` has no `data-cms-key` in HTML. The homepage demo glider reads `window.__EZ_CMS__.blocks['demos.videos']` via `getDemoVideosFromCms()` in `index.html` (list type: `[{ youtubeId, title, label }]`).
+**Demo videos list:** `demos.videos` is marked on the showcase wrapper. The homepage demo glider reads `window.__EZ_CMS__.blocks['demos.videos']` via `getDemoVideosFromCms()` in `index.html` (list type: `[{ src, poster?, title, label }]` — `src` may be a YouTube ID/URL or uploaded file path; legacy `youtubeId` is still accepted).
 
 ## Draft & preview
 
@@ -140,7 +140,7 @@ When logged in, a floating **Edit content** button appears on `index.html` / `co
 | `demos.eyebrow` | text | Section eyebrow |
 | `demos.title` | text | Section heading |
 | `demos.description` | text | Section description |
-| `demos.videos` | list | YouTube demo glider — **JS-driven** (see note above); admin list `[{ youtubeId, title, label }]` |
+| `demos.videos` | list | Demo glider — **JS-driven** (see note above); admin list `[{ src, poster?, title, label }]` |
 
 ### Final CTA (`#cta`)
 | Key | Type | Where it appears |

@@ -1340,13 +1340,15 @@
             aspect-ratio: 16 / 9;
         }
 
-        .demo-slide iframe.demo-video-embed {
+        .demo-slide iframe.demo-video-embed,
+        .demo-slide video.demo-video-embed {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
             border: 0;
             background: #0f0f0f;
+            object-fit: contain;
         }
 
         /* ═══ WORKFLOW PANEL + TIMELINE ═══ */
@@ -3286,7 +3288,7 @@
                                 <p class="demo-showcase__title" id="demo-video-current-title">EasyVariants Explainer Video</p>
                             </div>
                             <div class="demo-showcase__controls">
-                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">1 / 5</span>
+                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">1 / 10</span>
                                 <button type="button" id="light-prev" aria-label="Previous demo video" class="demo-showcase__nav ez-icon-btn">
                                     <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
                                 </button>
@@ -3683,25 +3685,59 @@
                 revealEls.forEach(revealInView);
             }, { once: true });
 
-            /* ═══ DEMO VIDEO GLIDER (YouTube) ═══ */
-            const defaultDemoVideos = [
-                { id: "Mrj4YI_RQzA", title: "EasyVariants Demo  Product Variants", label: "Product Variants" },
-                { id: "Kd0Olg1cE-s", title: "EasyVariants Demo  Cap Variants", label: "Cap Variants" },
-                { id: "2Zl_BkN9L6w", title: "EasyVariants Explainer Video", label: "Explainer Video" },
-                { id: "ETiWWJaoaZM", title: "EasyVariants Demo  Sweatshirt Variants", label: "Sweatshirt Variants" },
-                { id: "l5tyQAdNiEY", title: "EasyVariants Demo  Shoe Variants", label: "Shoe Variants" },
+            /* ═══ DEMO VIDEO GLIDER (YouTube or uploaded/file URL) ═══ */
+            const defaultDemoVideosBase = [
+                { src: "Mrj4YI_RQzA", title: "EasyVariants Demo  Product Variants", label: "Product Variants" },
+                { src: "Kd0Olg1cE-s", title: "EasyVariants Demo  Cap Variants", label: "Cap Variants" },
+                { src: "2Zl_BkN9L6w", title: "EasyVariants Explainer Video", label: "Explainer Video" },
+                { src: "ETiWWJaoaZM", title: "EasyVariants Demo  Sweatshirt Variants", label: "Sweatshirt Variants" },
+                { src: "l5tyQAdNiEY", title: "EasyVariants Demo  Shoe Variants", label: "Shoe Variants" },
             ];
+            const defaultDemoVideos = [...defaultDemoVideosBase, ...defaultDemoVideosBase];
+
+            function getDemoYouTubeId(value) {
+                const input = String(value || '').trim();
+                if (!input) return null;
+                if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+                try {
+                    const url = new URL(input);
+                    const host = url.hostname.replace(/^www\./, '').toLowerCase();
+                    if (host === 'youtu.be') return url.pathname.split('/').filter(Boolean)[0] || null;
+                    if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
+                        if (url.searchParams.get('v')) return url.searchParams.get('v');
+                        const parts = url.pathname.split('/').filter(Boolean);
+                        if (['embed', 'shorts', 'live'].includes(parts[0])) return parts[1] || null;
+                    }
+                } catch {
+                    return null;
+                }
+                return null;
+            }
+
+            function normalizeDemoVideo(v) {
+                const src = String(v?.src || v?.youtubeId || v?.id || '').trim();
+                return {
+                    src,
+                    youtubeId: getDemoYouTubeId(src),
+                    poster: String(v?.poster || '').trim(),
+                    title: v?.title || '',
+                    label: v?.label || v?.title || '',
+                };
+            }
 
             function getDemoVideosFromCms() {
                 const cms = window.__EZ_CMS__?.blocks?.['demos.videos'];
-                if (cms?.type === 'list' && Array.isArray(cms.value) && cms.value.length) {
-                    return cms.value.map((v) => ({
-                        id: v.youtubeId,
-                        title: v.title,
-                        label: v.label || v.title,
-                    }));
+                let list =
+                    cms?.type === 'list' && Array.isArray(cms.value) && cms.value.length
+                        ? cms.value.map(normalizeDemoVideo)
+                        : defaultDemoVideos.map(normalizeDemoVideo);
+                if (list.length < 10) {
+                    const base = [...list];
+                    while (list.length < 10) {
+                        list.push(base[list.length % base.length]);
+                    }
                 }
-                return defaultDemoVideos;
+                return list;
             }
 
             const youtubeEmbedUrl = (videoId) =>
@@ -3728,14 +3764,27 @@
                 let currentSlide = 0;
 
                 const activateSlide = (slide) => {
-                    const iframe = slide?.querySelector("iframe");
+                    const iframe = slide?.querySelector('iframe');
+                    const videoEl = slide?.querySelector('video');
                     const videoId = iframe?.dataset.videoId;
                     if (iframe && videoId) iframe.src = youtubeEmbedUrl(videoId);
+                    if (videoEl?.dataset.videoSrc) {
+                        if (videoEl.getAttribute('src') !== videoEl.dataset.videoSrc) {
+                            videoEl.src = videoEl.dataset.videoSrc;
+                            videoEl.load();
+                        }
+                    }
                 };
 
                 const deactivateSlide = (slide) => {
-                    const iframe = slide?.querySelector("iframe");
-                    if (iframe) iframe.removeAttribute("src");
+                    const iframe = slide?.querySelector('iframe');
+                    const videoEl = slide?.querySelector('video');
+                    if (iframe) iframe.removeAttribute('src');
+                    if (videoEl) {
+                        videoEl.pause();
+                        videoEl.removeAttribute('src');
+                        videoEl.load();
+                    }
                 };
 
                 const slides = demoVideos.map((video) => {
@@ -3745,14 +3794,32 @@
                     slide.style.inset = '0';
                     slide.style.willChange = 'transform, opacity';
                     slide.style.transition = 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)';
-                    slide.innerHTML = `
+                    const safeTitle = String(video.title || 'Demo video')
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/</g, '&lt;');
+                    if (video.youtubeId) {
+                        slide.innerHTML = `
                     <iframe
                         class="demo-video-embed"
-                        data-video-id="${video.id}"
-                        title="${video.title}"
+                        data-video-id="${video.youtubeId}"
+                        title="${safeTitle}"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen
                         loading="lazy"></iframe>`;
+                    } else {
+                        const safeSrc = String(video.src || '').replace(/"/g, '&quot;');
+                        const safePoster = String(video.poster || '').replace(/"/g, '&quot;');
+                        slide.innerHTML = `
+                    <video
+                        class="demo-video-embed"
+                        data-video-src="${safeSrc}"
+                        ${safePoster ? `poster="${safePoster}"` : ''}
+                        title="${safeTitle}"
+                        controls
+                        playsinline
+                        preload="none"></video>`;
+                    }
                     lightSlideshow.appendChild(slide);
                     return slide;
                 });

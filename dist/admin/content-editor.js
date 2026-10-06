@@ -40,7 +40,7 @@
     'Craft That Scales': 'Craft section heading',
     'Craft That Scales · Copy': 'Craft tabs, tab icons, headings, and paragraphs',
     'Demo Videos': 'Demo videos section intro',
-    'Demo Videos · YouTube list': 'YouTube videos in the carousel',
+    'Demo Videos · Video list': 'Videos in the homepage demo carousel',
     'Where It Fits': 'Product types and use cases section intro',
     'Where It Fits · Product types': 'Six product category cards',
     'Where It Fits · Use cases': 'Seasonal, evergreen, and prototype cards',
@@ -58,7 +58,7 @@
     eyebrow: 'Small label shown above the main heading',
     href: 'Link target — e.g. contactus.html or #demos',
     'hero.image': 'Main image next to the hero headline',
-    'demos.videos': 'YouTube video IDs for the homepage demo carousel',
+    'demos.videos': 'Upload a file, paste a URL/path, or use a YouTube link/ID for each carousel slide',
   };
 
   function isSvgSrc(src) {
@@ -112,7 +112,23 @@
 
   function blockList(blocks, key, fallback) {
     const b = blocks?.[key];
-    if (b?.type === 'list' && Array.isArray(b.value)) return b.value;
+    if (b?.type === 'list' && Array.isArray(b.value) && b.value.length) {
+      if (key === 'demos.videos') {
+        const normalized = b.value.map((item) => ({
+          src: item.src || item.youtubeId || '',
+          poster: item.poster || '',
+          title: item.title || '',
+          label: item.label || '',
+        }));
+        if (normalized.length >= 10) return normalized;
+        const padded = [...normalized];
+        while (padded.length < 10) {
+          padded.push({ ...normalized[padded.length % normalized.length] });
+        }
+        return padded;
+      }
+      return b.value;
+    }
     return fallback ?? [];
   }
 
@@ -305,6 +321,47 @@
     return row;
   }
 
+  function createUrlControl({ label, value, placeholder, onChange }) {
+    const row = el('div', 'cms-url-control');
+    const id = `cms-url-${Math.random().toString(36).slice(2)}`;
+    const urlLabel = el('label', 'cms-sublabel', label || 'Or choose by URL');
+    urlLabel.setAttribute('for', id);
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.inputMode = 'url';
+    input.id = id;
+    input.className = 'cms-url-control__input';
+    input.value = value || '';
+    input.placeholder = placeholder || 'https://example.com/media';
+    input.autocomplete = 'url';
+    input.addEventListener('input', () => onChange(input.value.trim()));
+
+    row.appendChild(urlLabel);
+    row.appendChild(input);
+    return { row, input };
+  }
+
+  function getYouTubeId(value) {
+    const input = String(value || '').trim();
+    if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+
+    try {
+      const url = new URL(input);
+      const host = url.hostname.replace(/^www\./, '').toLowerCase();
+      if (host === 'youtu.be') return url.pathname.split('/').filter(Boolean)[0] || null;
+      if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
+        if (url.searchParams.get('v')) return url.searchParams.get('v');
+        const parts = url.pathname.split('/').filter(Boolean);
+        if (['embed', 'shorts', 'live'].includes(parts[0])) return parts[1] || null;
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
+  }
+
   function renderTextField(field, value) {
     const wrap = el('div', 'cms-field');
     const id = `cms-${field.key.replace(/[^a-z0-9]+/gi, '-')}`;
@@ -357,6 +414,15 @@
 
     const preview = el('img', 'cms-preview');
     preview.alt = '';
+    const urlControl = createUrlControl({
+      label: 'Or choose image by URL',
+      value: value.src || '',
+      placeholder: 'https://example.com/image.jpg',
+      onChange: (src) => {
+        srcInput.value = src;
+        syncPreview();
+      },
+    });
 
     const syncPreview = () => {
       const src = srcInput.value.trim();
@@ -381,11 +447,13 @@
         hint: 'JPEG, PNG, WebP, GIF · Max 5 MB',
         onUploaded: (result) => {
           srcInput.value = result.src;
+          urlControl.input.value = result.src;
           syncPreview();
         },
       })
     );
 
+    wrap.appendChild(urlControl.row);
     wrap.appendChild(srcInput);
     wrap.appendChild(altLabel);
     wrap.appendChild(altInput);
@@ -417,20 +485,66 @@
     videoPreview.muted = true;
     videoPreview.hidden = true;
 
+    const youtubePreview = document.createElement('iframe');
+    youtubePreview.className = 'cms-preview cms-preview--video';
+    youtubePreview.title = 'YouTube video preview';
+    youtubePreview.setAttribute(
+      'allow',
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+    );
+    youtubePreview.setAttribute('allowfullscreen', 'true');
+    youtubePreview.hidden = true;
+
     const posterPreview = el('img', 'cms-preview cms-preview--poster');
     posterPreview.alt = 'Video poster preview';
     posterPreview.hidden = true;
 
+    const videoUrlControl = createUrlControl({
+      label: 'Or choose video by URL (YouTube or direct video link)',
+      value: value.src || '',
+      placeholder: 'https://youtube.com/watch?v=… or https://example.com/video.mp4',
+      onChange: (src) => {
+        srcInput.value = src;
+        syncPreview();
+      },
+    });
+    const posterUrlControl = createUrlControl({
+      label: 'Or choose poster by URL',
+      value: value.poster || '',
+      placeholder: 'https://example.com/poster.jpg',
+      onChange: (src) => {
+        posterInput.value = src;
+        syncPreview();
+      },
+    });
+
     const syncPreview = () => {
       const src = srcInput.value.trim();
       const poster = posterInput.value.trim();
+      const youtubeId = getYouTubeId(src);
 
-      if (src) {
+      if (youtubeId) {
+        videoPreview.pause();
+        videoPreview.removeAttribute('src');
+        videoPreview.load();
+        videoPreview.hidden = true;
+        youtubePreview.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1`;
+        youtubePreview.hidden = false;
+      } else if (src) {
+        youtubePreview.hidden = true;
+        youtubePreview.removeAttribute('src');
         videoPreview.src = src;
         if (poster) videoPreview.poster = poster;
+        else videoPreview.removeAttribute('poster');
+        videoPreview.load();
         videoPreview.hidden = false;
       } else {
+        youtubePreview.hidden = true;
+        youtubePreview.removeAttribute('src');
+        videoPreview.pause();
         videoPreview.removeAttribute('src');
+        videoPreview.removeAttribute('poster');
+        videoPreview.load();
         videoPreview.hidden = true;
       }
 
@@ -454,10 +568,12 @@
         hint: 'MP4, WebM, MOV · Max 50 MB',
         onUploaded: (result) => {
           srcInput.value = result.src;
+          videoUrlControl.input.value = result.src;
           syncPreview();
         },
       })
     );
+    wrap.appendChild(videoUrlControl.row);
 
     wrap.appendChild(el('p', 'cms-sublabel', 'Change poster image (optional)'));
     wrap.appendChild(
@@ -468,14 +584,17 @@
         hint: 'JPEG, PNG, WebP, GIF · Max 5 MB',
         onUploaded: (result) => {
           posterInput.value = result.src;
+          posterUrlControl.input.value = result.src;
           syncPreview();
         },
       })
     );
+    wrap.appendChild(posterUrlControl.row);
 
     wrap.appendChild(srcInput);
     wrap.appendChild(posterInput);
     wrap.appendChild(videoPreview);
+    wrap.appendChild(youtubePreview);
     wrap.appendChild(posterPreview);
     return wrap;
   }
@@ -502,6 +621,15 @@
 
     const fileStatus = el('p', 'cms-upload-status', value.src ? 'Custom file selected' : 'Using default icon');
     const preview = el('div', 'cms-icon-preview');
+    const urlControl = createUrlControl({
+      label: 'Or choose icon by URL',
+      value: value.src || '',
+      placeholder: 'https://example.com/icon.svg',
+      onChange: (src) => {
+        srcInput.value = src;
+        syncPreview();
+      },
+    });
 
     const syncPreview = () => {
       const src = srcInput.value.trim();
@@ -533,15 +661,18 @@
         hint: 'SVG, PNG, JPEG, WebP, GIF · Max 5 MB',
         onUploaded: (result) => {
           srcInput.value = result.src || '';
+          urlControl.input.value = result.src || '';
           syncPreview();
         },
       })
     );
+    wrap.appendChild(urlControl.row);
 
     const resetBtn = el('button', 'clear-filters cms-icon-reset', 'Use default icon');
     resetBtn.type = 'button';
     resetBtn.addEventListener('click', () => {
       srcInput.value = '';
+      urlControl.input.value = '';
       syncPreview();
     });
 
@@ -554,20 +685,177 @@
     return wrap;
   }
 
+  function normalizeListItem(field, item) {
+    if (!item || typeof item !== 'object') return item;
+    if (field.key !== 'demos.videos') return item;
+    return {
+      src: item.src || item.youtubeId || '',
+      poster: item.poster || '',
+      title: item.title || '',
+      label: item.label || '',
+    };
+  }
+
+  function renderListVideoSubfield(field, index, item) {
+    const wrap = el('div', 'cms-field cms-field--nested cms-field--list-video');
+
+    const srcInput = document.createElement('input');
+    srcInput.type = 'hidden';
+    srcInput.value = item.src || '';
+    srcInput.required = true;
+    srcInput.dataset.listIndex = String(index);
+    srcInput.dataset.listSubKey = 'src';
+
+    const posterInput = document.createElement('input');
+    posterInput.type = 'hidden';
+    posterInput.value = item.poster || '';
+    posterInput.dataset.listIndex = String(index);
+    posterInput.dataset.listSubKey = 'poster';
+
+    const videoPreview = document.createElement('video');
+    videoPreview.className = 'cms-preview cms-preview--video';
+    videoPreview.controls = true;
+    videoPreview.muted = true;
+    videoPreview.hidden = true;
+
+    const youtubePreview = document.createElement('iframe');
+    youtubePreview.className = 'cms-preview cms-preview--video';
+    youtubePreview.title = 'YouTube video preview';
+    youtubePreview.setAttribute(
+      'allow',
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+    );
+    youtubePreview.setAttribute('allowfullscreen', 'true');
+    youtubePreview.hidden = true;
+
+    const posterPreview = el('img', 'cms-preview cms-preview--poster');
+    posterPreview.alt = 'Video poster preview';
+    posterPreview.hidden = true;
+
+    const videoUrlControl = createUrlControl({
+      label: 'Or choose video by URL (YouTube, direct link, or site path)',
+      value: item.src || '',
+      placeholder: 'https://youtube.com/watch?v=… or /uploads/demo.mp4',
+      onChange: (src) => {
+        srcInput.value = src;
+        syncPreview();
+      },
+    });
+    const posterUrlControl = createUrlControl({
+      label: 'Or choose poster by URL',
+      value: item.poster || '',
+      placeholder: 'https://example.com/poster.jpg',
+      onChange: (src) => {
+        posterInput.value = src;
+        syncPreview();
+      },
+    });
+
+    const syncPreview = () => {
+      const src = srcInput.value.trim();
+      const poster = posterInput.value.trim();
+      const youtubeId = getYouTubeId(src);
+
+      if (youtubeId) {
+        videoPreview.pause();
+        videoPreview.removeAttribute('src');
+        videoPreview.load();
+        videoPreview.hidden = true;
+        youtubePreview.src = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1`;
+        youtubePreview.hidden = false;
+      } else if (src) {
+        youtubePreview.hidden = true;
+        youtubePreview.removeAttribute('src');
+        videoPreview.src = src;
+        if (poster) videoPreview.poster = poster;
+        else videoPreview.removeAttribute('poster');
+        videoPreview.load();
+        videoPreview.hidden = false;
+      } else {
+        youtubePreview.hidden = true;
+        youtubePreview.removeAttribute('src');
+        videoPreview.pause();
+        videoPreview.removeAttribute('src');
+        videoPreview.removeAttribute('poster');
+        videoPreview.load();
+        videoPreview.hidden = true;
+      }
+
+      if (poster) {
+        posterPreview.src = poster;
+        posterPreview.hidden = false;
+      } else {
+        posterPreview.hidden = true;
+        posterPreview.removeAttribute('src');
+      }
+    };
+
+    syncPreview();
+
+    wrap.appendChild(el('p', 'cms-sublabel', 'Change this video'));
+    wrap.appendChild(
+      createUploadControl({
+        label: 'Choose file',
+        accept: UPLOAD_ACCEPT.video,
+        kind: 'video',
+        hint: 'MP4, WebM, MOV · Max 50 MB',
+        onUploaded: (result) => {
+          srcInput.value = result.src;
+          videoUrlControl.input.value = result.src;
+          syncPreview();
+        },
+      })
+    );
+    wrap.appendChild(videoUrlControl.row);
+
+    wrap.appendChild(el('p', 'cms-sublabel', 'Change poster image (optional)'));
+    wrap.appendChild(
+      createUploadControl({
+        label: 'Choose file',
+        accept: UPLOAD_ACCEPT.poster,
+        kind: 'poster',
+        hint: 'JPEG, PNG, WebP, GIF · Max 5 MB',
+        onUploaded: (result) => {
+          posterInput.value = result.src;
+          posterUrlControl.input.value = result.src;
+          syncPreview();
+        },
+      })
+    );
+    wrap.appendChild(posterUrlControl.row);
+
+    wrap.appendChild(srcInput);
+    wrap.appendChild(posterInput);
+    wrap.appendChild(videoPreview);
+    wrap.appendChild(youtubePreview);
+    wrap.appendChild(posterPreview);
+    return wrap;
+  }
+
   function renderListField(field, items) {
     const wrap = el('div', 'cms-field cms-field--list');
     wrap.dataset.cmsKey = field.key;
     wrap.dataset.cmsType = 'list';
 
     wrap.appendChild(el('label', '', field.label));
+    appendFieldHint(wrap, field);
     const listHost = el('div', 'cms-list-items');
     wrap.appendChild(listHost);
 
-    items.forEach((item, index) => {
+    const hasVideoSubfield = (field.itemFields || []).some((sub) => sub.type === 'video');
+
+    items.forEach((rawItem, index) => {
+      const item = normalizeListItem(field, rawItem) || {};
       const card = el('div', 'cms-list-item');
       card.appendChild(el('p', 'cms-list-item__title', `${field.listItemLabel || 'Item'} ${index + 1}`));
 
       field.itemFields.forEach((sub) => {
+        if (sub.type === 'video') {
+          card.appendChild(renderListVideoSubfield(field, index, item));
+          return;
+        }
+        if (hasVideoSubfield && sub.key === 'poster') return;
+
         const subWrap = el('div', 'cms-field cms-field--nested');
         const subId = `cms-${field.key}-${index}-${sub.key}`.replace(/[^a-z0-9]+/gi, '-');
         const subLabel = el('label', '', sub.label);
@@ -576,7 +864,7 @@
         input.type = 'text';
         input.id = subId;
         input.value = item[sub.key] || '';
-        input.required = true;
+        input.required = !sub.optional;
         input.dataset.listIndex = String(index);
         input.dataset.listSubKey = sub.key;
         subWrap.appendChild(subLabel);

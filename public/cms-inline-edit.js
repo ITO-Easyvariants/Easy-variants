@@ -1107,24 +1107,37 @@
   }
 
   function getYouTubeId(url) {
-    if (!url) return null;
+    const input = String(url || '').trim();
+    if (!input) return null;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
+    const match = input.match(regExp);
     return (match && match[2].length === 11) ? match[2] : null;
   }
 
   function editVideoList(el, key) {
-    const defaultDemos = [
-      { youtubeId: 'Mrj4YI_RQzA', title: 'EasyVariants Demo  Product Variants', label: 'Product Variants' },
-      { youtubeId: 'Kd0Olg1cE-s', title: 'EasyVariants Demo  Cap Variants', label: 'Cap Variants' },
-      { youtubeId: '2Zl_BkN9L6w', title: 'EasyVariants Explainer Video', label: 'Explainer Video' },
-      { youtubeId: 'ETiWWJaoaZM', title: 'EasyVariants Demo  Sweatshirt Variants', label: 'Sweatshirt Variants' },
-      { youtubeId: 'l5tyQAdNiEY', title: 'EasyVariants Demo  Shoe Variants', label: 'Shoe Variants' },
+    const defaultDemosBase = [
+      { src: 'Mrj4YI_RQzA', poster: '', title: 'EasyVariants Demo  Product Variants', label: 'Product Variants' },
+      { src: 'Kd0Olg1cE-s', poster: '', title: 'EasyVariants Demo  Cap Variants', label: 'Cap Variants' },
+      { src: '2Zl_BkN9L6w', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer Video' },
+      { src: 'ETiWWJaoaZM', poster: '', title: 'EasyVariants Demo  Sweatshirt Variants', label: 'Sweatshirt Variants' },
+      { src: 'l5tyQAdNiEY', poster: '', title: 'EasyVariants Demo  Shoe Variants', label: 'Shoe Variants' },
     ];
+    const defaultDemos = [...defaultDemosBase, ...defaultDemosBase];
     const listBlock = state.publishedBlocks[key];
-    const items = (listBlock && Array.isArray(listBlock.value) && listBlock.value.length > 0)
+    const rawItems = (listBlock && Array.isArray(listBlock.value) && listBlock.value.length > 0)
       ? listBlock.value
       : defaultDemos;
+    const items = rawItems.map((item) => ({
+      src: item.src || item.youtubeId || '',
+      poster: item.poster || '',
+      title: item.title || '',
+      label: item.label || '',
+    }));
+    if (!items.length) items.push(...defaultDemos);
+    while (items.length < 10) {
+      items.push({ ...items[items.length % items.length] });
+    }
 
     let listHtml = '';
     items.forEach((item, index) => {
@@ -1133,10 +1146,16 @@
           <p class="ez-list-item-edit-card-title">Video ${index + 1}</p>
           <label>Title</label>
           <input data-field="title" type="text" value="${escapeAttr(item.title || '')}" />
-          <label>YouTube video ID or URL</label>
-          <input data-field="youtubeId" type="text" value="${escapeAttr(item.youtubeId || '')}" />
           <label>Short label</label>
           <input data-field="label" type="text" value="${escapeAttr(item.label || '')}" />
+          <label>Change this video</label>
+          ${filePickerMarkup('file', 'video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov', 'Choose file')}
+          <label>Or video URL / YouTube / site path</label>
+          <input data-field="src" type="text" value="${escapeAttr(item.src || '')}" placeholder="https://… or /uploads/demo.mp4" />
+          <label>Poster image (optional)</label>
+          ${filePickerMarkup('poster-file', 'image/jpeg,image/png,image/webp,image/gif', 'Choose file')}
+          <label>Or poster URL</label>
+          <input data-field="poster" type="text" value="${escapeAttr(item.poster || '')}" placeholder="https://…/poster.jpg" />
         </div>
       `;
     });
@@ -1153,23 +1172,56 @@
           <button class="ghost" data-action="cancel" type="button">Cancel</button>
         </div>
       `,
-      onConfirm: (pop) => {
+      onConfirm: async (pop) => {
         const itemCards = pop.querySelectorAll('.ez-list-item-edit-card');
         const nextValue = [];
 
-        itemCards.forEach((card) => {
-          const index = Number(card.dataset.index);
-          const title = card.querySelector('[data-field="title"]').value.trim();
-          let youtubeId = card.querySelector('[data-field="youtubeId"]').value.trim();
-          const label = card.querySelector('[data-field="label"]').value.trim();
+        try {
+          for (const card of itemCards) {
+            const title = card.querySelector('[data-field="title"]').value.trim();
+            const label = card.querySelector('[data-field="label"]').value.trim();
+            const srcInput = card.querySelector('[data-field="src"]');
+            const posterInput = card.querySelector('[data-field="poster"]');
+            const fileInput = card.querySelector('[data-field="file"]');
+            const posterFileInput = card.querySelector('[data-field="poster-file"]');
 
-          const parsedId = getYouTubeId(youtubeId);
-          if (parsedId) {
-            youtubeId = parsedId;
+            const file = fileInput?.files?.[0];
+            const posterFile = posterFileInput?.files?.[0];
+
+            if (file && file.size > 50 * 1024 * 1024) {
+              toast('Video exceeds the 50 MB limit. Please use a smaller file.', 'error');
+              return;
+            }
+            if (posterFile && posterFile.size > 5 * 1024 * 1024) {
+              toast('Poster exceeds the 5 MB limit. Please optimize the image.', 'error');
+              return;
+            }
+
+            let src = srcInput.value.trim();
+            let poster = posterInput.value.trim();
+
+            if (file) {
+              toast(`Uploading video ${Number(card.dataset.index) + 1}…`, 'success');
+              const up = await uploadFile(file, 'video');
+              src = up.src;
+            }
+            if (posterFile) {
+              toast(`Uploading poster ${Number(card.dataset.index) + 1}…`, 'success');
+              const up = await uploadFile(posterFile, 'poster');
+              poster = up.src;
+            }
+
+            const parsedId = getYouTubeId(src);
+            if (parsedId && !src.includes('/') && !src.includes('.')) {
+              src = parsedId;
+            }
+
+            nextValue.push({ title, label, src, poster });
           }
-
-          nextValue.push({ title, youtubeId, label });
-        });
+        } catch (err) {
+          toast(err.message || 'Upload failed.', 'error');
+          return;
+        }
 
         let changed = false;
         if (nextValue.length !== items.length) {
@@ -1178,7 +1230,8 @@
           for (let i = 0; i < items.length; i++) {
             if (
               nextValue[i].title !== items[i].title ||
-              nextValue[i].youtubeId !== items[i].youtubeId ||
+              nextValue[i].src !== items[i].src ||
+              nextValue[i].poster !== items[i].poster ||
               nextValue[i].label !== items[i].label
             ) {
               changed = true;
@@ -1196,6 +1249,12 @@
         }
 
         closePopover();
+      },
+      onReady: (pop) => {
+        pop.querySelectorAll('.ez-list-item-edit-card').forEach((card) => {
+          bindFilePickerName(card, 'file');
+          bindFilePickerName(card, 'poster-file');
+        });
       },
     });
   }
