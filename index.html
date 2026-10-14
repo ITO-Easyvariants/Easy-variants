@@ -3400,7 +3400,7 @@
                                 <p class="demo-showcase__title" id="demo-video-current-title">EasyVariants Explainer Video</p>
                             </div>
                             <div class="demo-showcase__controls">
-                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">1 / 10</span>
+                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">1 / 3</span>
                                 <button type="button" id="light-prev" aria-label="Previous demo video" class="demo-showcase__nav ez-icon-btn">
                                     <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
                                 </button>
@@ -3799,9 +3799,9 @@
 
             /* ═══ DEMO VIDEO GLIDER (thumbnail slides + in-place playback) ═══ */
             const defaultDemoVideos = [
-                { src: "Mrj4YI_RQzA", title: "EasyVariants Demo  Product Variants", label: "Product Variants" },
-                { src: "Kd0Olg1cE-s", title: "EasyVariants Demo  Cap Variants", label: "Cap Variants" },
-                { src: "2Zl_BkN9L6w", title: "EasyVariants Explainer Video", label: "Explainer Video" },
+                { src: "/images/EasyVariantsExplainerVideo_Apparel.mp4", title: "EasyVariants Demo  Apparel", label: "Apparel" },
+                { src: "/images/EasyVariantsExplainerVideo_Headwear_v02.mp4", title: "EasyVariants Demo  Headwear", label: "Headwear" },
+                { src: "/images/EasyVariants_Explainer.mp4", title: "EasyVariants Explainer Video", label: "Explainer" },
             ];
 
             function getDemoYouTubeId(value) {
@@ -3848,9 +3848,10 @@
                 const cms = window.__EZ_CMS__?.blocks?.['demos.videos'];
                 let list =
                     cms?.type === 'list' && Array.isArray(cms.value) && cms.value.length
-                        ? cms.value.map(normalizeDemoVideo).filter((v) => v.src)
+                        ? cms.value.map(normalizeDemoVideo).filter((v) => v.src).slice(0, 3)
                         : defaultDemoVideos.map(normalizeDemoVideo);
                 if (!list.length) list = defaultDemoVideos.map(normalizeDemoVideo);
+                if (list.length > 3) list = list.slice(0, 3);
                 if (list.length < 3) {
                     const base = [...list];
                     while (list.length < 3) {

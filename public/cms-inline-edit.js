@@ -1024,8 +1024,8 @@
         const file = fileInput.files?.[0];
         const posterFile = posterFileInput.files?.[0];
 
-        if (file && file.size > 50 * 1024 * 1024) {
-          toast('Video exceeds the 50 MB limit. Please use a smaller file.', 'error');
+        if (file && file.size > 200 * 1024 * 1024) {
+          toast('Video exceeds the 200 MB limit. Please use a smaller file.', 'error');
           return;
         }
         if (posterFile && posterFile.size > 5 * 1024 * 1024) {
@@ -1117,9 +1117,9 @@
 
   function editVideoList(el, key) {
     const defaultDemos = [
-      { src: 'Mrj4YI_RQzA', poster: '', title: 'EasyVariants Demo  Product Variants', label: 'Product Variants' },
-      { src: 'Kd0Olg1cE-s', poster: '', title: 'EasyVariants Demo  Cap Variants', label: 'Cap Variants' },
-      { src: '2Zl_BkN9L6w', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer Video' },
+      { src: '/images/EasyVariantsExplainerVideo_Apparel.mp4', poster: '', title: 'EasyVariants Demo  Apparel', label: 'Apparel' },
+      { src: '/images/EasyVariantsExplainerVideo_Headwear_v02.mp4', poster: '', title: 'EasyVariants Demo  Headwear', label: 'Headwear' },
+      { src: '/images/EasyVariants_Explainer.mp4', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer' },
     ];
     const listBlock = state.publishedBlocks[key];
     const rawItems = (listBlock && Array.isArray(listBlock.value) && listBlock.value.length > 0)
@@ -1130,7 +1130,7 @@
       poster: item.poster || '',
       title: item.title || '',
       label: item.label || '',
-    }));
+    })).slice(0, 3);
     if (!items.length) items.push(...defaultDemos);
     while (items.length < 3) {
       items.push({ ...items[items.length % items.length] });
@@ -1185,8 +1185,8 @@
             const file = fileInput?.files?.[0];
             const posterFile = posterFileInput?.files?.[0];
 
-            if (file && file.size > 50 * 1024 * 1024) {
-              toast('Video exceeds the 50 MB limit. Please use a smaller file.', 'error');
+            if (file && file.size > 200 * 1024 * 1024) {
+              toast('Video exceeds the 200 MB limit. Please use a smaller file.', 'error');
               return;
             }
             if (posterFile && posterFile.size > 5 * 1024 * 1024) {

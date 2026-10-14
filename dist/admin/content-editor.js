@@ -119,7 +119,7 @@
           poster: item.poster || '',
           title: item.title || '',
           label: item.label || '',
-        }));
+        })).slice(0, 3);
         if (normalized.length >= 3) return normalized;
         const padded = [...normalized];
         while (padded.length < 3) {
@@ -565,7 +565,7 @@
         label: 'Choose file',
         accept: UPLOAD_ACCEPT.video,
         kind: 'video',
-        hint: 'MP4, WebM, MOV · Max 50 MB',
+        hint: 'MP4, WebM, MOV · Max 200 MB',
         onUploaded: (result) => {
           srcInput.value = result.src;
           videoUrlControl.input.value = result.src;
@@ -798,7 +798,7 @@
         label: 'Choose file',
         accept: UPLOAD_ACCEPT.video,
         kind: 'video',
-        hint: 'MP4, WebM, MOV · Max 50 MB',
+        hint: 'MP4, WebM, MOV · Max 200 MB',
         onUploaded: (result) => {
           srcInput.value = result.src;
           videoUrlControl.input.value = result.src;

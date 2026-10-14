@@ -18,7 +18,7 @@ export const MEDIA_LIMITS = {
   image: 5 * 1024 * 1024,
   poster: 5 * 1024 * 1024,
   icon: 5 * 1024 * 1024,
-  video: 50 * 1024 * 1024,
+  video: 200 * 1024 * 1024,
 };
 
 const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);

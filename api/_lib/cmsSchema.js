@@ -849,9 +849,9 @@ export const CMS_SCHEMA = {
             { key: 'label', label: 'Short label', type: 'text' },
           ],
           default: [
-            { src: 'Mrj4YI_RQzA', poster: '', title: 'EasyVariants Demo  Product Variants', label: 'Product Variants' },
-            { src: 'Kd0Olg1cE-s', poster: '', title: 'EasyVariants Demo  Cap Variants', label: 'Cap Variants' },
-            { src: '2Zl_BkN9L6w', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer Video' },
+            { src: '/images/EasyVariantsExplainerVideo_Apparel.mp4', poster: '', title: 'EasyVariants Demo  Apparel', label: 'Apparel' },
+            { src: '/images/EasyVariantsExplainerVideo_Headwear_v02.mp4', poster: '', title: 'EasyVariants Demo  Headwear', label: 'Headwear' },
+            { src: '/images/EasyVariants_Explainer.mp4', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer' },
           ],
         },
       ],
