@@ -120,9 +120,9 @@
           title: item.title || '',
           label: item.label || '',
         }));
-        if (normalized.length >= 10) return normalized;
+        if (normalized.length >= 3) return normalized;
         const padded = [...normalized];
-        while (padded.length < 10) {
+        while (padded.length < 3) {
           padded.push({ ...normalized[padded.length % normalized.length] });
         }
         return padded;

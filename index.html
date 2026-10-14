@@ -3798,14 +3798,11 @@
             }, { once: true });
 
             /* ═══ DEMO VIDEO GLIDER (thumbnail slides + in-place playback) ═══ */
-            const defaultDemoVideosBase = [
+            const defaultDemoVideos = [
                 { src: "Mrj4YI_RQzA", title: "EasyVariants Demo  Product Variants", label: "Product Variants" },
                 { src: "Kd0Olg1cE-s", title: "EasyVariants Demo  Cap Variants", label: "Cap Variants" },
                 { src: "2Zl_BkN9L6w", title: "EasyVariants Explainer Video", label: "Explainer Video" },
-                { src: "ETiWWJaoaZM", title: "EasyVariants Demo  Sweatshirt Variants", label: "Sweatshirt Variants" },
-                { src: "l5tyQAdNiEY", title: "EasyVariants Demo  Shoe Variants", label: "Shoe Variants" },
             ];
-            const defaultDemoVideos = [...defaultDemoVideosBase, ...defaultDemoVideosBase];
 
             function getDemoYouTubeId(value) {
                 const input = String(value || '').trim();
@@ -3854,9 +3851,9 @@
                         ? cms.value.map(normalizeDemoVideo).filter((v) => v.src)
                         : defaultDemoVideos.map(normalizeDemoVideo);
                 if (!list.length) list = defaultDemoVideos.map(normalizeDemoVideo);
-                if (list.length < 10) {
+                if (list.length < 3) {
                     const base = [...list];
-                    while (list.length < 10) {
+                    while (list.length < 3) {
                         list.push({ ...base[list.length % base.length] });
                     }
                 }

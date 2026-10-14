@@ -1116,14 +1116,11 @@
   }
 
   function editVideoList(el, key) {
-    const defaultDemosBase = [
+    const defaultDemos = [
       { src: 'Mrj4YI_RQzA', poster: '', title: 'EasyVariants Demo  Product Variants', label: 'Product Variants' },
       { src: 'Kd0Olg1cE-s', poster: '', title: 'EasyVariants Demo  Cap Variants', label: 'Cap Variants' },
       { src: '2Zl_BkN9L6w', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer Video' },
-      { src: 'ETiWWJaoaZM', poster: '', title: 'EasyVariants Demo  Sweatshirt Variants', label: 'Sweatshirt Variants' },
-      { src: 'l5tyQAdNiEY', poster: '', title: 'EasyVariants Demo  Shoe Variants', label: 'Shoe Variants' },
     ];
-    const defaultDemos = [...defaultDemosBase, ...defaultDemosBase];
     const listBlock = state.publishedBlocks[key];
     const rawItems = (listBlock && Array.isArray(listBlock.value) && listBlock.value.length > 0)
       ? listBlock.value
@@ -1135,7 +1132,7 @@
       label: item.label || '',
     }));
     if (!items.length) items.push(...defaultDemos);
-    while (items.length < 10) {
+    while (items.length < 3) {
       items.push({ ...items[items.length % items.length] });
     }
 
