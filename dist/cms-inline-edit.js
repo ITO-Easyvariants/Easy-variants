@@ -1077,6 +1077,7 @@
                   video.autoplay = true;
                   video.loop = true;
                   video.muted = true;
+                  video.controls = true;
                   video.setAttribute('playsinline', 'true');
                   video.style.cssText = el.style.cssText;
                   video.src = next.src;

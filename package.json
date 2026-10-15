@@ -30,6 +30,7 @@
     "busboy": "^1.6.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.2",
+    "nodemailer": "^10.1.1",
     "three": "^0.183.2"
   },
   "devDependencies": {

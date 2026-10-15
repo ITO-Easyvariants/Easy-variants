@@ -1,5 +1,6 @@
 import { connectToDatabase } from './_lib/mongodb.js';
 import Lead from './_lib/Lead.js';
+import { sendContactEmails } from './_lib/mail.js';
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
@@ -39,7 +40,16 @@ export default async function handler(req, res) {
       userAgent: String(req.headers['user-agent'] || ''),
     });
 
-    return res.status(201).json({ ok: true, id: lead._id });
+    // Lead is saved first so a mail outage does not lose the submission.
+    const mail = await sendContactEmails({
+      firstName: lead.firstName,
+      lastName: lead.lastName,
+      email: lead.email,
+      company: lead.company,
+      message: lead.message,
+    });
+
+    return res.status(201).json({ ok: true, id: lead._id, mail });
   } catch (err) {
     console.error('POST /api/contact failed:', err);
     return res.status(500).json({ error: 'Could not save your message. Please try again later.' });
