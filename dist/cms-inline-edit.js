@@ -1117,8 +1117,17 @@
   }
 
   function editVideoList(el, key) {
+    // Temporarily hidden — restore Apparel entry / clear this list to unhide
+    const HIDDEN_DEMO_VIDEO_SRCS = ['/images/EasyVariantsExplainerVideo_Apparel.mp4'];
+    const DEMO_VIDEO_SLOT_COUNT = 2;
+    const isHiddenDemoVideo = (item) => {
+      const src = String(item?.src || item?.youtubeId || '').trim();
+      return HIDDEN_DEMO_VIDEO_SRCS.some(
+        (hidden) => src === hidden || src.endsWith(hidden)
+      );
+    };
     const defaultDemos = [
-      { src: '/images/EasyVariantsExplainerVideo_Apparel.mp4', poster: '', title: 'EasyVariants Demo  Apparel', label: 'Apparel' },
+      // { src: '/images/EasyVariantsExplainerVideo_Apparel.mp4', poster: '', title: 'EasyVariants Demo  Apparel', label: 'Apparel' },
       { src: '/images/EasyVariantsExplainerVideo_Headwear_v02.mp4', poster: '', title: 'EasyVariants Demo  Headwear', label: 'Headwear' },
       { src: '/images/EasyVariants_Explainer.mp4', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer' },
     ];
@@ -1131,9 +1140,9 @@
       poster: item.poster || '',
       title: item.title || '',
       label: item.label || '',
-    })).slice(0, 3);
+    })).filter((item) => item.src && !isHiddenDemoVideo(item)).slice(0, DEMO_VIDEO_SLOT_COUNT);
     if (!items.length) items.push(...defaultDemos);
-    while (items.length < 3) {
+    while (items.length < DEMO_VIDEO_SLOT_COUNT) {
       items.push({ ...items[items.length % items.length] });
     }
 

@@ -110,19 +110,34 @@
     return fallback ?? { src: '', name: '', color: '' };
   }
 
+  // Temporarily hidden — clear this list (and restore schema default) to unhide Apparel
+  const HIDDEN_DEMO_VIDEO_SRCS = ['/images/EasyVariantsExplainerVideo_Apparel.mp4'];
+  const DEMO_VIDEO_SLOT_COUNT = 2;
+
+  function isHiddenDemoVideo(item) {
+    const src = String(item?.src || item?.youtubeId || '').trim();
+    return HIDDEN_DEMO_VIDEO_SRCS.some(
+      (hidden) => src === hidden || src.endsWith(hidden)
+    );
+  }
+
   function blockList(blocks, key, fallback) {
     const b = blocks?.[key];
     if (b?.type === 'list' && Array.isArray(b.value) && b.value.length) {
       if (key === 'demos.videos') {
-        const normalized = b.value.map((item) => ({
-          src: item.src || item.youtubeId || '',
-          poster: item.poster || '',
-          title: item.title || '',
-          label: item.label || '',
-        })).slice(0, 3);
-        if (normalized.length >= 3) return normalized;
+        const normalized = b.value
+          .map((item) => ({
+            src: item.src || item.youtubeId || '',
+            poster: item.poster || '',
+            title: item.title || '',
+            label: item.label || '',
+          }))
+          .filter((item) => item.src && !isHiddenDemoVideo(item))
+          .slice(0, DEMO_VIDEO_SLOT_COUNT);
+        if (normalized.length >= DEMO_VIDEO_SLOT_COUNT) return normalized;
+        if (!normalized.length) return fallback ?? [];
         const padded = [...normalized];
-        while (padded.length < 3) {
+        while (padded.length < DEMO_VIDEO_SLOT_COUNT) {
           padded.push({ ...normalized[padded.length % normalized.length] });
         }
         return padded;

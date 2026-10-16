@@ -16,7 +16,6 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="/tailwind.css" />
     <style>
         /* ═══ BASE ═══ */
         :root {
@@ -52,6 +51,22 @@
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
             background-repeat: no-repeat, repeat;
             background-size: 100% 800px, 100px 100px;
+        }
+
+        /* Hide CMS media until Cloudflare URLs hydrate (avoids flash of local defaults) */
+        img.cms-media-pending,
+        video.cms-media-pending,
+        iframe.cms-media-pending {
+            opacity: 0;
+        }
+        .video-showcase.cms-media-pending,
+        .demo-showcase.cms-media-pending #light-slideshow {
+            opacity: 0.35;
+            background: #e8eaf2;
+        }
+        img.cms-media-pending {
+            min-height: 12rem;
+            background: #e8eaf2;
         }
 
         /* Pill + icon buttons: see tailwind.css (.ev-pill-btn, .ez-icon-btn) */
@@ -377,6 +392,17 @@
             .demo-showcase__title {
                 white-space: normal;
                 font-size: 1rem;
+            }
+
+            .demo-showcase__bar {
+                padding: 0.85rem 1rem;
+                gap: 0.75rem;
+            }
+
+            .demo-showcase__counter {
+                font-size: 0.6875rem;
+                padding: 0.35rem 0.5rem;
+                margin-right: 0;
             }
 
             .demo-showcase {
@@ -1340,6 +1366,81 @@
             aspect-ratio: 16 / 9;
         }
 
+        .demo-slide {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #121212;
+        }
+
+        .demo-slide__poster {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #121212;
+            pointer-events: none;
+        }
+
+        .demo-slide__poster-fallback {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 30% 20%, rgba(53, 37, 205, 0.35), transparent 55%),
+                linear-gradient(145deg, #1a1a2e 0%, #0f0f0f 55%, #16162a 100%);
+            pointer-events: none;
+        }
+
+        .demo-slide__play {
+            position: relative;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 4.5rem;
+            height: 4.5rem;
+            border: 0;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #3525cd;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .demo-slide__play .material-symbols-outlined {
+            font-size: 2.25rem;
+            margin-left: 2px;
+        }
+
+        .demo-slide__play:hover,
+        .demo-slide__play:focus-visible {
+            transform: scale(1.06);
+            background: #ffffff;
+            outline: none;
+        }
+
+        .demo-slide__label {
+            position: absolute;
+            left: 1rem;
+            bottom: 1rem;
+            z-index: 2;
+            max-width: calc(100% - 2rem);
+            margin: 0;
+            padding: 0.4rem 0.75rem;
+            border-radius: 9999px;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            pointer-events: none;
+        }
+
         .demo-slide iframe.demo-video-embed,
         .demo-slide video.demo-video-embed {
             position: absolute;
@@ -1349,6 +1450,32 @@
             border: 0;
             background: #0f0f0f;
             object-fit: contain;
+            z-index: 3;
+        }
+
+        .demo-slide.is-playing .demo-slide__poster,
+        .demo-slide.is-playing .demo-slide__poster-fallback,
+        .demo-slide.is-playing .demo-slide__play,
+        .demo-slide.is-playing .demo-slide__label {
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            .demo-slide__play {
+                width: 3.75rem;
+                height: 3.75rem;
+            }
+
+            .demo-slide__play .material-symbols-outlined {
+                font-size: 1.85rem;
+            }
+
+            .demo-slide__label {
+                left: 0.75rem;
+                bottom: 0.75rem;
+                max-width: calc(100% - 1.5rem);
+                font-size: 0.6875rem;
+            }
         }
 
         /* ═══ WORKFLOW PANEL + TIMELINE ═══ */
@@ -2296,6 +2423,7 @@
             }
         }
     </script>
+  <link rel="stylesheet" crossorigin href="/assets/tailwind-Cuw0piSz.css">
 </head>
 
 <body class="font-body text-on-surface antialiased" data-cms-page="home">
@@ -2306,7 +2434,7 @@
             <!-- Left: Logo -->
             <div class="flex-1 flex justify-start min-w-0">
                 <a href="#home" class="flex items-center shrink-0">
-                    <img src="logo.png" alt="EasyVariants"
+                    <img src="/assets/logo-C015aalk.png" alt="EasyVariants"
                         class="brand-logo-img h-14 w-auto max-w-[min(100vw-8rem,220px)] sm:h-16 md:h-16" />
                 </a>
             </div>
@@ -2405,8 +2533,9 @@
 
                         <div class="hero-showcase-stage w-full">
                             <div class="hero-scale-in relative w-full rounded-2xl border border-slate-200/80 bg-white p-2 shadow-[0_32px_80px_rgba(53,37,205,0.12)] overflow-hidden">
-                                <img src="/images/EasyVariants application.jpg.jpeg" alt="EasyVariants application interface"
-                                    class="w-full h-auto rounded-xl object-cover" loading="eager"
+                                <img data-cms-fallback-src="/images/EasyVariants application.jpg.jpeg"
+                                    alt="EasyVariants application interface"
+                                    class="w-full h-auto rounded-xl object-cover cms-media-pending" loading="eager"
                                     data-cms-key="hero.image" />
                             </div>
 
@@ -2470,9 +2599,11 @@
 
                     <div class="max-w-4xl mx-auto">
                         <div class="relative overflow-hidden group">
-                            <div class="video-showcase aspect-video relative" data-cms-key="meet.video">
-                                <video id="light-meet-vid" src="/images/YTDown_YouTube_EasyVariants-Explainer-Video_Media_2Zl_BkN9L6w_002_720p.mp4" autoplay loop muted playsinline controls
-                                    preload="auto" class="w-full h-full object-cover rounded-[1.5rem]"
+                            <div class="video-showcase aspect-video relative cms-media-pending" data-cms-key="meet.video">
+                                <video id="light-meet-vid"
+                                    data-cms-fallback-src="/images/YTDown_YouTube_EasyVariants-Explainer-Video_Media_2Zl_BkN9L6w_002_720p.mp4"
+                                    loop muted playsinline controls
+                                    preload="none" class="w-full h-full object-cover rounded-[1.5rem] cms-media-pending"
                                     style="will-change: transform; transform: translateZ(0);"></video>
                             </div>
                         </div>
@@ -2677,11 +2808,11 @@
                             <div class="relative w-full inside-ez-media pb-6 sm:pb-10 lg:pb-0">
                                 <!-- Main large image -->
                                 <div class="relative z-10 w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-outline-variant/10">
-                                    <img src="/images/EasyVariants.jpg.jpeg" alt="EasyVariants Plugin Interface" class="w-full h-auto object-cover" data-cms-key="inside.image.main" />
+                                    <img data-cms-fallback-src="/images/EasyVariants.jpg.jpeg" alt="EasyVariants Plugin Interface" class="w-full h-auto object-cover cms-media-pending" data-cms-key="inside.image.main" />
                                 </div>
                                 <!-- Overlapping smaller image (desktop only) -->
                                 <div class="inside-ez-overlap absolute -bottom-12 -right-6 z-20 w-[45%] max-w-[220px] overflow-hidden rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-outline-variant/20 hidden lg:block">
-                                    <img src="/images/EasyVariants application.jpg.jpeg" alt="EasyVariants Application" class="w-full h-auto object-cover" data-cms-key="inside.image.overlap" />
+                                    <img data-cms-fallback-src="/images/EasyVariants application.jpg.jpeg" alt="EasyVariants Application" class="w-full h-auto object-cover cms-media-pending" data-cms-key="inside.image.overlap" />
                                 </div>
                             </div>
                         </div>
@@ -3281,14 +3412,14 @@
                         <p class="ez-section-desc" data-cms-key="demos.description">Explore enterprise-ready design automation flows built for high-volume manufacturing environments.</p>
                     </div>
 
-                    <div class="demo-showcase" data-cms-key="demos.videos">
+                    <div class="demo-showcase cms-media-pending" data-cms-key="demos.videos">
                         <div class="demo-showcase__bar">
                             <div class="demo-showcase__meta">
                                 <span class="material-symbols-outlined" aria-hidden="true">play_circle</span>
-                                <p class="demo-showcase__title" id="demo-video-current-title">EasyVariants Explainer Video</p>
+                                <p class="demo-showcase__title" id="demo-video-current-title">Loading demos…</p>
                             </div>
                             <div class="demo-showcase__controls">
-                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">1 / 3</span>
+                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">–</span>
                                 <button type="button" id="light-prev" aria-label="Previous demo video" class="demo-showcase__nav ez-icon-btn">
                                     <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
                                 </button>
@@ -3298,7 +3429,7 @@
                             </div>
                         </div>
                         <div class="demo-showcase__stage-wrap">
-                            <div id="light-slideshow" class="demo-showcase__stage" role="region" aria-label="Demo video player">
+                            <div id="light-slideshow" class="demo-showcase__stage" role="region" aria-label="Demo video slideshow">
                                 <!-- Slides injected by JS -->
                             </div>
                         </div>
@@ -3440,7 +3571,7 @@
 
                 <!-- Brand -->
                 <div class="xl:col-span-4 flex flex-col gap-5">
-                    <img src="logo.png" alt="EasyVariants"
+                    <img src="/assets/logo-C015aalk.png" alt="EasyVariants"
                         class="brand-logo-img h-20 w-auto max-w-[min(100%,280px)] sm:h-24 object-contain self-start" />
                     <p class="ez-p2 text-on-surface font-semibold max-w-md" data-cms-key="footer.brand.description">
                         Enterprise design automation for large manufacturers. Scale product variants across global
@@ -3685,12 +3816,17 @@
                 revealEls.forEach(revealInView);
             }, { once: true });
 
-            /* ═══ DEMO VIDEO GLIDER (YouTube or uploaded/file URL) ═══ */
+            /* ═══ DEMO VIDEO GLIDER (thumbnail slides + in-place playback) ═══ */
+            /* Temporarily hidden — restore to defaultDemoVideos / clear this list to unhide */
+            const HIDDEN_DEMO_VIDEO_SRCS = [
+                '/images/EasyVariantsExplainerVideo_Apparel.mp4',
+            ];
             const defaultDemoVideos = [
-                { src: "/images/EasyVariantsExplainerVideo_Apparel.mp4", title: "EasyVariants Demo  Apparel", label: "Apparel" },
+                // { src: "/images/EasyVariantsExplainerVideo_Apparel.mp4", title: "EasyVariants Demo  Apparel", label: "Apparel" },
                 { src: "/images/EasyVariantsExplainerVideo_Headwear_v02.mp4", title: "EasyVariants Demo  Headwear", label: "Headwear" },
                 { src: "/images/EasyVariants_Explainer.mp4", title: "EasyVariants Explainer Video", label: "Explainer" },
             ];
+            const DEMO_VIDEO_SLOT_COUNT = 2;
 
             function getDemoYouTubeId(value) {
                 const input = String(value || '').trim();
@@ -3712,36 +3848,67 @@
             }
 
             function normalizeDemoVideo(v) {
-                const src = String(v?.src || v?.youtubeId || v?.id || '').trim();
+                const rawSrc = v?.src;
+                const src = String(
+                    (rawSrc && typeof rawSrc === 'object' ? rawSrc.src : rawSrc) ||
+                        v?.youtubeId ||
+                        v?.id ||
+                        ''
+                ).trim();
+                const rawPoster = v?.poster;
+                const poster = String(
+                    rawPoster && typeof rawPoster === 'object' ? rawPoster.src : rawPoster || ''
+                ).trim();
                 return {
                     src,
                     youtubeId: getDemoYouTubeId(src),
-                    poster: String(v?.poster || '').trim(),
+                    poster,
                     title: v?.title || '',
                     label: v?.label || v?.title || '',
                 };
+            }
+
+            function isHiddenDemoVideo(v) {
+                const src = String(v?.src || '').trim();
+                return HIDDEN_DEMO_VIDEO_SRCS.some(
+                    (hidden) => src === hidden || src.endsWith(hidden)
+                );
             }
 
             function getDemoVideosFromCms() {
                 const cms = window.__EZ_CMS__?.blocks?.['demos.videos'];
                 let list =
                     cms?.type === 'list' && Array.isArray(cms.value) && cms.value.length
-                        ? cms.value.map(normalizeDemoVideo).slice(0, 3)
+                        ? cms.value
+                              .map(normalizeDemoVideo)
+                              .filter((v) => v.src && !isHiddenDemoVideo(v))
+                              .slice(0, DEMO_VIDEO_SLOT_COUNT)
                         : defaultDemoVideos.map(normalizeDemoVideo);
-                if (list.length > 3) list = list.slice(0, 3);
-                if (list.length < 3) {
+                if (!list.length) list = defaultDemoVideos.map(normalizeDemoVideo);
+                if (list.length > DEMO_VIDEO_SLOT_COUNT) list = list.slice(0, DEMO_VIDEO_SLOT_COUNT);
+                if (list.length < DEMO_VIDEO_SLOT_COUNT) {
                     const base = [...list];
-                    while (list.length < 3) {
-                        list.push(base[list.length % base.length]);
+                    while (list.length < DEMO_VIDEO_SLOT_COUNT) {
+                        list.push({ ...base[list.length % base.length] });
                     }
                 }
                 return list;
             }
 
-            const youtubeEmbedUrl = (videoId) =>
-                `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+            const youtubeEmbedUrl = (videoId, autoplay) =>
+                `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1${autoplay ? '&autoplay=1' : ''}`;
+
+            const youtubePosterUrl = (videoId) =>
+                `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+            const escapeDemoAttr = (value) =>
+                String(value || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/</g, '&lt;');
 
             let demoGliderTimer = null;
+            let demoGliderCleanup = null;
 
             function initDemoGlider() {
                 const lightSlideshow = document.getElementById('light-slideshow');
@@ -3751,6 +3918,10 @@
                 const lightNext = document.getElementById('light-next');
                 if (!lightSlideshow) return;
 
+                if (typeof demoGliderCleanup === 'function') {
+                    demoGliderCleanup();
+                    demoGliderCleanup = null;
+                }
                 if (demoGliderTimer) {
                     clearInterval(demoGliderTimer);
                     demoGliderTimer = null;
@@ -3760,64 +3931,136 @@
                 lightSlideshow.innerHTML = '';
 
                 let currentSlide = 0;
+                let isPlaying = false;
 
-                const activateSlide = (slide) => {
-                    const iframe = slide?.querySelector('iframe');
-                    const videoEl = slide?.querySelector('video');
-                    const videoId = iframe?.dataset.videoId;
-                    if (iframe && videoId) iframe.src = youtubeEmbedUrl(videoId);
-                    if (videoEl?.dataset.videoSrc) {
-                        if (videoEl.getAttribute('src') !== videoEl.dataset.videoSrc) {
-                            videoEl.src = videoEl.dataset.videoSrc;
-                            videoEl.load();
+                const stopAutoSlide = () => {
+                    if (demoGliderTimer) {
+                        clearInterval(demoGliderTimer);
+                        demoGliderTimer = null;
+                    }
+                };
+
+                const startAutoSlide = () => {
+                    stopAutoSlide();
+                    if (isPlaying || slides.length < 2) return;
+                    demoGliderTimer = setInterval(() => {
+                        if (document.visibilityState !== 'visible' || isPlaying) return;
+                        currentSlide = currentSlide === slides.length - 1 ? 0 : currentSlide + 1;
+                        updateSlides();
+                    }, 8000);
+                };
+
+                const stopPlaybackOnSlide = (slide) => {
+                    if (!slide) return;
+                    slide.classList.remove('is-playing');
+                    slide.querySelectorAll('iframe.demo-video-embed, video.demo-video-embed').forEach((el) => {
+                        if (el.tagName === 'VIDEO') {
+                            el.pause();
+                            el.removeAttribute('src');
+                            el.load();
                         }
+                        el.remove();
+                    });
+                };
+
+                const stopAllPlayback = () => {
+                    slides.forEach(stopPlaybackOnSlide);
+                    isPlaying = false;
+                };
+
+                const playInPlace = (slide, video) => {
+                    if (!slide || (!video?.src && !video?.youtubeId)) return;
+
+                    stopAllPlayback();
+                    isPlaying = true;
+                    stopAutoSlide();
+
+                    slide.classList.add('is-playing');
+
+                    if (video.youtubeId) {
+                        const iframe = document.createElement('iframe');
+                        iframe.className = 'demo-video-embed';
+                        iframe.src = youtubeEmbedUrl(video.youtubeId, true);
+                        iframe.title = video.title || 'Demo video';
+                        iframe.allow =
+                            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                        iframe.allowFullscreen = true;
+                        iframe.setAttribute('allowfullscreen', '');
+                        slide.appendChild(iframe);
+                        return;
+                    }
+
+                    const videoEl = document.createElement('video');
+                    videoEl.className = 'demo-video-embed';
+                    videoEl.src = video.src;
+                    videoEl.controls = true;
+                    videoEl.playsInline = true;
+                    videoEl.setAttribute('playsinline', '');
+                    videoEl.preload = 'auto';
+                    if (video.poster) videoEl.poster = video.poster;
+                    videoEl.title = video.title || 'Demo video';
+                    videoEl.addEventListener('ended', () => {
+                        stopPlaybackOnSlide(slide);
+                        isPlaying = false;
+                        startAutoSlide();
+                    });
+                    videoEl.addEventListener('error', () => {
+                        stopPlaybackOnSlide(slide);
+                        isPlaying = false;
+                        startAutoSlide();
+                    });
+                    slide.appendChild(videoEl);
+                    const playPromise = videoEl.play();
+                    if (playPromise && typeof playPromise.catch === 'function') {
+                        playPromise.catch(() => {});
                     }
                 };
 
-                const deactivateSlide = (slide) => {
-                    const iframe = slide?.querySelector('iframe');
-                    const videoEl = slide?.querySelector('video');
-                    if (iframe) iframe.removeAttribute('src');
-                    if (videoEl) {
-                        videoEl.pause();
-                        videoEl.removeAttribute('src');
-                        videoEl.load();
-                    }
-                };
-
-                const slides = demoVideos.map((video) => {
+                const slides = demoVideos.map((video, index) => {
                     const slide = document.createElement('div');
                     slide.className = 'demo-slide';
                     slide.style.position = 'absolute';
                     slide.style.inset = '0';
                     slide.style.willChange = 'transform, opacity';
-                    slide.style.transition = 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)';
-                    const safeTitle = String(video.title || 'Demo video')
-                        .replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/</g, '&lt;');
-                    if (video.youtubeId) {
+                    slide.style.transition =
+                        'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)';
+
+                    const posterSrc =
+                        video.poster ||
+                        (video.youtubeId ? youtubePosterUrl(video.youtubeId) : '');
+                    const safeTitle = escapeDemoAttr(video.title || video.label || 'Demo video');
+                    const safeLabel = escapeDemoAttr(video.label || video.title || `Video ${index + 1}`);
+
+                    if (posterSrc) {
                         slide.innerHTML = `
-                    <iframe
-                        class="demo-video-embed"
-                        data-video-id="${video.youtubeId}"
-                        title="${safeTitle}"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen
-                        loading="lazy"></iframe>`;
+                    <img class="demo-slide__poster" src="${escapeDemoAttr(posterSrc)}" alt="" loading="lazy" decoding="async" />
+                    <button type="button" class="demo-slide__play" aria-label="Play ${safeTitle}">
+                        <span class="material-symbols-outlined" aria-hidden="true">play_arrow</span>
+                    </button>
+                    <p class="demo-slide__label">${safeLabel}</p>`;
+                        const img = slide.querySelector('img');
+                        img?.addEventListener('error', () => {
+                            img.remove();
+                            const fallback = document.createElement('div');
+                            fallback.className = 'demo-slide__poster-fallback';
+                            fallback.setAttribute('aria-hidden', 'true');
+                            slide.insertBefore(fallback, slide.firstChild);
+                        });
                     } else {
-                        const safeSrc = String(video.src || '').replace(/"/g, '&quot;');
-                        const safePoster = String(video.poster || '').replace(/"/g, '&quot;');
                         slide.innerHTML = `
-                    <video
-                        class="demo-video-embed"
-                        data-video-src="${safeSrc}"
-                        ${safePoster ? `poster="${safePoster}"` : ''}
-                        title="${safeTitle}"
-                        controls
-                        playsinline
-                        preload="none"></video>`;
+                    <div class="demo-slide__poster-fallback" aria-hidden="true"></div>
+                    <button type="button" class="demo-slide__play" aria-label="Play ${safeTitle}">
+                        <span class="material-symbols-outlined" aria-hidden="true">play_arrow</span>
+                    </button>
+                    <p class="demo-slide__label">${safeLabel}</p>`;
                     }
+
+                    slide.querySelector('.demo-slide__play')?.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        playInPlace(slide, video);
+                    });
+
                     lightSlideshow.appendChild(slide);
                     return slide;
                 });
@@ -3826,47 +4069,83 @@
                     const video = demoVideos[currentSlide];
                     slides.forEach((slide, idx) => {
                         const isActive = idx === currentSlide;
+                        if (!isActive) stopPlaybackOnSlide(slide);
                         slide.style.opacity = isActive ? '1' : '0';
-                        slide.style.transform = isActive ? 'scale(1) translateY(0)' : 'scale(0.98) translateY(8px)';
+                        slide.style.transform = isActive
+                            ? 'scale(1) translateY(0)'
+                            : 'scale(0.98) translateY(8px)';
                         slide.style.pointerEvents = isActive ? 'auto' : 'none';
                         slide.style.zIndex = isActive ? '20' : '1';
-                        if (isActive) activateSlide(slide);
-                        else deactivateSlide(slide);
+                        slide.setAttribute('aria-hidden', isActive ? 'false' : 'true');
                     });
-                    if (demoVideoTitle && video) demoVideoTitle.textContent = video.title;
-                    if (demoVideoCounter) demoVideoCounter.textContent = `${currentSlide + 1} / ${demoVideos.length}`;
+                    if (!slides[currentSlide]?.classList.contains('is-playing')) {
+                        isPlaying = false;
+                    }
+                    if (demoVideoTitle && video) {
+                        demoVideoTitle.textContent = video.title || video.label || 'Demo video';
+                    }
+                    if (demoVideoCounter) {
+                        demoVideoCounter.textContent = `${currentSlide + 1} / ${demoVideos.length}`;
+                    }
                 };
 
-                const startAutoSlide = () => {
-                    if (demoGliderTimer) clearInterval(demoGliderTimer);
-                    demoGliderTimer = setInterval(() => {
-                        if (document.visibilityState === 'visible') {
-                            currentSlide = (currentSlide === slides.length - 1) ? 0 : currentSlide + 1;
-                            updateSlides();
-                        }
-                    }, 8000);
-                };
-
-                lightPrev.onclick = () => {
-                    currentSlide = (currentSlide === 0) ? slides.length - 1 : currentSlide - 1;
+                const goTo = (nextIndex) => {
+                    if (!slides.length) return;
+                    stopAllPlayback();
+                    currentSlide = ((nextIndex % slides.length) + slides.length) % slides.length;
                     updateSlides();
-                };
-                lightNext.onclick = () => {
-                    currentSlide = (currentSlide === slides.length - 1) ? 0 : currentSlide + 1;
-                    updateSlides();
+                    startAutoSlide();
                 };
 
-                lightSlideshow.onmouseenter = () => {
-                    if (demoGliderTimer) clearInterval(demoGliderTimer);
+                if (lightPrev) {
+                    lightPrev.onclick = () => goTo(currentSlide - 1);
+                }
+                if (lightNext) {
+                    lightNext.onclick = () => goTo(currentSlide + 1);
+                }
+
+                const onKeyDown = (e) => {
+                    if (isPlaying) return;
+                    if (e.key === 'ArrowLeft') goTo(currentSlide - 1);
+                    if (e.key === 'ArrowRight') goTo(currentSlide + 1);
                 };
-                lightSlideshow.onmouseleave = startAutoSlide;
+                document.addEventListener('keydown', onKeyDown);
+
+                const onVisibility = () => {
+                    if (document.visibilityState === 'hidden') stopAutoSlide();
+                    else if (!isPlaying) startAutoSlide();
+                };
+                document.addEventListener('visibilitychange', onVisibility);
+
+                demoGliderCleanup = () => {
+                    stopAutoSlide();
+                    stopAllPlayback();
+                    document.removeEventListener('keydown', onKeyDown);
+                    document.removeEventListener('visibilitychange', onVisibility);
+                };
 
                 updateSlides();
                 startAutoSlide();
             }
 
-            initDemoGlider();
-            document.addEventListener('ez-cms-loaded', initDemoGlider);
+            /* Wait for CMS so Cloudflare videos render first — not local defaults */
+            let demoGliderBooted = false;
+            const bootDemoGlider = () => {
+                demoGliderBooted = true;
+                document
+                    .querySelector('.demo-showcase[data-cms-key="demos.videos"]')
+                    ?.classList.remove('cms-media-pending');
+                initDemoGlider();
+            };
+            document.addEventListener('ez-cms-loaded', bootDemoGlider);
+            if (window.__EZ_CMS__ || document.body.classList.contains('ez-cms-ready')) {
+                bootDemoGlider();
+            } else {
+                // Safety: if CMS never responds, still show local fallbacks
+                setTimeout(() => {
+                    if (!demoGliderBooted) bootDemoGlider();
+                }, 4000);
+            }
 
             /* ═══ PROBLEM CARD CAROUSEL ═══ */
             const problemCarouselEl = document.getElementById('problem-carousel');

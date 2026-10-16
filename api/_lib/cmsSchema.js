@@ -848,8 +848,8 @@ export const CMS_SCHEMA = {
             { key: 'title', label: 'Title', type: 'text' },
             { key: 'label', label: 'Short label', type: 'text' },
           ],
+          // Apparel temporarily hidden — restore first entry to unhide in admin + site defaults
           default: [
-            { src: '/images/EasyVariantsExplainerVideo_Apparel.mp4', poster: '', title: 'EasyVariants Demo  Apparel', label: 'Apparel' },
             { src: '/images/EasyVariantsExplainerVideo_Headwear_v02.mp4', poster: '', title: 'EasyVariants Demo  Headwear', label: 'Headwear' },
             { src: '/images/EasyVariants_Explainer.mp4', poster: '', title: 'EasyVariants Explainer Video', label: 'Explainer' },
           ],

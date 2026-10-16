@@ -87,7 +87,11 @@
 
   function applyImage(el, value) {
     if (!value || typeof value !== 'object') return;
-    if (value.src) el.src = value.src;
+    if (value.src) {
+      el.src = value.src;
+      el.removeAttribute('data-cms-fallback-src');
+      revealMediaWhenReady(el);
+    }
     if (value.alt != null) el.alt = String(value.alt);
   }
 
@@ -200,6 +204,185 @@
     return (match && match[2].length === 11) ? match[2] : null;
   }
 
+  function injectMediaPendingStyles() {
+    if (document.getElementById('ez-cms-media-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'ez-cms-media-styles';
+    style.textContent = `
+      img.cms-media-pending,
+      video.cms-media-pending,
+      iframe.cms-media-pending,
+      .cms-media-pending video,
+      .cms-media-pending iframe {
+        opacity: 0 !important;
+      }
+      [data-cms-key].cms-media-pending,
+      .demo-showcase.cms-media-pending #light-slideshow {
+        opacity: 0.35;
+        transition: opacity 0.25s ease;
+      }
+      body.ez-cms-ready img.cms-media-pending,
+      body.ez-cms-ready video.cms-media-pending,
+      body.ez-cms-ready iframe.cms-media-pending {
+        opacity: 0 !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function markPending(el) {
+    if (!el) return;
+    el.classList.add('cms-media-pending');
+  }
+
+  function clearPending(el) {
+    if (!el) return;
+    el.classList.remove('cms-media-pending');
+    const host = el.closest('[data-cms-key]');
+    if (host) host.classList.remove('cms-media-pending');
+  }
+
+  function revealMediaWhenReady(el) {
+    if (!el) return;
+    const done = () => clearPending(el);
+    if (el.tagName === 'IMG') {
+      if (el.complete && el.naturalWidth > 0) {
+        done();
+        return;
+      }
+      el.addEventListener('load', done, { once: true });
+      el.addEventListener('error', done, { once: true });
+      return;
+    }
+    if (el.tagName === 'VIDEO') {
+      if (el.readyState >= 2) {
+        done();
+        return;
+      }
+      el.addEventListener('loadeddata', done, { once: true });
+      el.addEventListener('error', done, { once: true });
+      return;
+    }
+    if (el.tagName === 'IFRAME') {
+      el.addEventListener('load', done, { once: true });
+      // Iframes may not fire load reliably cross-origin; reveal shortly after.
+      setTimeout(done, 400);
+      return;
+    }
+    done();
+  }
+
+  /**
+   * Stop default/local media from painting before CMS (Cloudflare) URLs arrive.
+   * Stashes current src as data-cms-fallback-src and clears the live src.
+   */
+  function deferCmsMedia() {
+    injectMediaPendingStyles();
+
+    document.querySelectorAll('img[data-cms-key]').forEach((img) => {
+      const current = String(img.getAttribute('src') || '').trim();
+      const fallback = String(img.getAttribute('data-cms-fallback-src') || '').trim();
+      if (current && !fallback) {
+        img.setAttribute('data-cms-fallback-src', current);
+      }
+      if (current) {
+        img.removeAttribute('src');
+        markPending(img);
+      } else if (fallback) {
+        markPending(img);
+      }
+    });
+
+    document.querySelectorAll('[data-cms-key]').forEach((host) => {
+      const media = host.matches('video, iframe')
+        ? host
+        : host.querySelector('video, iframe');
+      if (!media) return;
+
+      markPending(host);
+      markPending(media);
+
+      const current = String(media.getAttribute('src') || '').trim();
+      const fallback = String(media.getAttribute('data-cms-fallback-src') || '').trim();
+      if (current && !fallback) {
+        media.setAttribute('data-cms-fallback-src', current);
+      }
+      if (current) {
+        media.removeAttribute('src');
+        if (media.tagName === 'VIDEO') {
+          try {
+            media.pause();
+          } catch {
+            /* ignore */
+          }
+          media.removeAttribute('autoplay');
+          media.setAttribute('preload', 'none');
+          if (typeof media.load === 'function') media.load();
+        }
+      }
+    });
+
+    document.querySelectorAll('.demo-showcase[data-cms-key], [data-cms-key="demos.videos"]').forEach((el) => {
+      markPending(el);
+    });
+  }
+
+  function restoreFallbackMedia() {
+    document.querySelectorAll('img[data-cms-fallback-src]').forEach((img) => {
+      if (img.getAttribute('src')) {
+        // CMS already applied a URL — keep pending until the new asset loads.
+        if (img.classList.contains('cms-media-pending')) revealMediaWhenReady(img);
+        return;
+      }
+      const fallback = img.getAttribute('data-cms-fallback-src');
+      if (fallback) {
+        img.src = fallback;
+        revealMediaWhenReady(img);
+      } else {
+        clearPending(img);
+      }
+    });
+
+    document.querySelectorAll('video[data-cms-fallback-src], iframe[data-cms-fallback-src]').forEach((el) => {
+      if (el.getAttribute('src')) {
+        if (el.classList.contains('cms-media-pending')) revealMediaWhenReady(el);
+        return;
+      }
+      const fallback = el.getAttribute('data-cms-fallback-src');
+      if (!fallback) {
+        clearPending(el);
+        return;
+      }
+      el.src = fallback;
+      if (el.tagName === 'VIDEO') {
+        el.setAttribute('preload', 'auto');
+        el.muted = true;
+        el.autoplay = true;
+        el.loop = true;
+        if (typeof el.load === 'function') el.load();
+        el.play?.().catch(() => {});
+      }
+      revealMediaWhenReady(el);
+    });
+
+    document.querySelectorAll('.demo-showcase.cms-media-pending').forEach((el) => {
+      clearPending(el);
+    });
+
+    // Clear hosts that only wrapped media and are still pending with no child media left.
+    document.querySelectorAll('[data-cms-key].cms-media-pending').forEach((el) => {
+      const media = el.querySelector('video, iframe, img');
+      if (!media || !media.classList.contains('cms-media-pending')) clearPending(el);
+    });
+  }
+
+  function finishCmsHydration(detail) {
+    restoreFallbackMedia();
+    document.body.classList.add('ez-cms-ready');
+    window.__EZ_CMS__ = detail || window.__EZ_CMS__ || null;
+    document.dispatchEvent(new CustomEvent('ez-cms-loaded', { detail: window.__EZ_CMS__ }));
+  }
+
   function applyVideo(container, value) {
     if (!value || typeof value !== 'object') return;
     const el = container.tagName === 'DIV' ? container.querySelector('video, iframe') : container;
@@ -209,6 +392,9 @@
       if (el.tagName === 'IFRAME') {
         const expectedSrc = `https://www.youtube-nocookie.com/embed/${ytId}?rel=0&modestbranding=1`;
         if (el.src !== expectedSrc) el.src = expectedSrc;
+        el.removeAttribute('data-cms-fallback-src');
+        revealMediaWhenReady(el);
+        clearPending(container);
       } else {
         const iframe = document.createElement('iframe');
         iframe.className = el.className;
@@ -219,11 +405,14 @@
         iframe.setAttribute('allowfullscreen', 'true');
         iframe.style.cssText = el.style.cssText;
         for (const attr of el.attributes) {
-          if (attr.name.startsWith('data-')) {
+          if (attr.name.startsWith('data-') && attr.name !== 'data-cms-fallback-src') {
             iframe.setAttribute(attr.name, attr.value);
           }
         }
+        markPending(iframe);
         el.parentNode.replaceChild(iframe, el);
+        revealMediaWhenReady(iframe);
+        clearPending(container);
       }
     } else {
       if (el.tagName === 'IFRAME') {
@@ -237,21 +426,32 @@
         video.setAttribute('playsinline', 'true');
         video.style.cssText = el.style.cssText;
         for (const attr of el.attributes) {
-          if (attr.name.startsWith('data-')) {
+          if (attr.name.startsWith('data-') && attr.name !== 'data-cms-fallback-src') {
             video.setAttribute(attr.name, attr.value);
           }
         }
         video.src = value.src;
         if (value.poster) video.poster = value.poster;
+        markPending(video);
         el.parentNode.replaceChild(video, el);
         if (typeof video.load === 'function') video.load();
+        revealMediaWhenReady(video);
+        clearPending(container);
       } else {
         if (value.src) {
           el.src = value.src;
+          el.removeAttribute('data-cms-fallback-src');
+          el.setAttribute('preload', 'auto');
+          el.muted = true;
+          el.autoplay = true;
+          el.loop = true;
           if (typeof el.load === 'function') el.load();
+          el.play?.().catch(() => {});
+          revealMediaWhenReady(el);
         }
         if (value.poster) el.poster = value.poster;
         else el.removeAttribute('poster');
+        clearPending(container);
       }
     }
   }
@@ -357,6 +557,8 @@
     const edit = isEditMode();
     const token = localStorage.getItem('ev_admin_token');
 
+    deferCmsMedia();
+
     if ((preview || edit) && !token) {
       if (preview) {
         injectPreviewStyles();
@@ -366,6 +568,7 @@
           'Draft preview requires admin login. <a href="/admin/login.html">Log in</a> then reload this page.';
         document.body.appendChild(banner);
       }
+      finishCmsHydration(null);
       return null;
     }
 
@@ -377,7 +580,10 @@
       });
 
       const data = await fetchPageContent(page);
-      if (!data?.blocks) return null;
+      if (!data?.blocks) {
+        finishCmsHydration(null);
+        return null;
+      }
 
       const blocksByPage = { [page]: sanitizeBlockKeys(data.blocks) };
       applyBlocks(page, blocksByPage[page]);
@@ -392,7 +598,7 @@
 
       if (preview && !edit) showPreviewBanner(Boolean(data.isDraftPreview));
 
-      window.__EZ_CMS__ = {
+      finishCmsHydration({
         page,
         blocks: blocksByPage[page],
         blocksByPage,
@@ -401,10 +607,10 @@
         edit,
         isDraftPreview: Boolean(data.isDraftPreview),
         hasDraft: Boolean(data.hasDraft),
-      };
-      document.dispatchEvent(new CustomEvent('ez-cms-loaded', { detail: window.__EZ_CMS__ }));
+      });
       return data;
     } catch {
+      finishCmsHydration(null);
       return null;
     }
   }
@@ -413,7 +619,12 @@
 
   function boot() {
     const page = document.body?.dataset?.cmsPage;
-    if (page) loadCmsContent(page);
+    if (page) {
+      loadCmsContent(page);
+    } else {
+      // Non-CMS page: still clear any pending state if styles were injected elsewhere.
+      document.body?.classList?.add('ez-cms-ready');
+    }
   }
 
   if (document.readyState === 'loading') {

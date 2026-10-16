@@ -54,6 +54,22 @@
             background-size: 100% 800px, 100px 100px;
         }
 
+        /* Hide CMS media until Cloudflare URLs hydrate (avoids flash of local defaults) */
+        img.cms-media-pending,
+        video.cms-media-pending,
+        iframe.cms-media-pending {
+            opacity: 0;
+        }
+        .video-showcase.cms-media-pending,
+        .demo-showcase.cms-media-pending #light-slideshow {
+            opacity: 0.35;
+            background: #e8eaf2;
+        }
+        img.cms-media-pending {
+            min-height: 12rem;
+            background: #e8eaf2;
+        }
+
         /* Pill + icon buttons: see tailwind.css (.ev-pill-btn, .ez-icon-btn) */
 
         /* ═══ GLASS ═══ */
@@ -2517,8 +2533,9 @@
 
                         <div class="hero-showcase-stage w-full">
                             <div class="hero-scale-in relative w-full rounded-2xl border border-slate-200/80 bg-white p-2 shadow-[0_32px_80px_rgba(53,37,205,0.12)] overflow-hidden">
-                                <img src="/images/EasyVariants application.jpg.jpeg" alt="EasyVariants application interface"
-                                    class="w-full h-auto rounded-xl object-cover" loading="eager"
+                                <img data-cms-fallback-src="/images/EasyVariants application.jpg.jpeg"
+                                    alt="EasyVariants application interface"
+                                    class="w-full h-auto rounded-xl object-cover cms-media-pending" loading="eager"
                                     data-cms-key="hero.image" />
                             </div>
 
@@ -2582,9 +2599,11 @@
 
                     <div class="max-w-4xl mx-auto">
                         <div class="relative overflow-hidden group">
-                            <div class="video-showcase aspect-video relative" data-cms-key="meet.video">
-                                <video id="light-meet-vid" src="/images/YTDown_YouTube_EasyVariants-Explainer-Video_Media_2Zl_BkN9L6w_002_720p.mp4" autoplay loop muted playsinline controls
-                                    preload="auto" class="w-full h-full object-cover rounded-[1.5rem]"
+                            <div class="video-showcase aspect-video relative cms-media-pending" data-cms-key="meet.video">
+                                <video id="light-meet-vid"
+                                    data-cms-fallback-src="/images/YTDown_YouTube_EasyVariants-Explainer-Video_Media_2Zl_BkN9L6w_002_720p.mp4"
+                                    loop muted playsinline controls
+                                    preload="none" class="w-full h-full object-cover rounded-[1.5rem] cms-media-pending"
                                     style="will-change: transform; transform: translateZ(0);"></video>
                             </div>
                         </div>
@@ -2789,11 +2808,11 @@
                             <div class="relative w-full inside-ez-media pb-6 sm:pb-10 lg:pb-0">
                                 <!-- Main large image -->
                                 <div class="relative z-10 w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-outline-variant/10">
-                                    <img src="/images/EasyVariants.jpg.jpeg" alt="EasyVariants Plugin Interface" class="w-full h-auto object-cover" data-cms-key="inside.image.main" />
+                                    <img data-cms-fallback-src="/images/EasyVariants.jpg.jpeg" alt="EasyVariants Plugin Interface" class="w-full h-auto object-cover cms-media-pending" data-cms-key="inside.image.main" />
                                 </div>
                                 <!-- Overlapping smaller image (desktop only) -->
                                 <div class="inside-ez-overlap absolute -bottom-12 -right-6 z-20 w-[45%] max-w-[220px] overflow-hidden rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-outline-variant/20 hidden lg:block">
-                                    <img src="/images/EasyVariants application.jpg.jpeg" alt="EasyVariants Application" class="w-full h-auto object-cover" data-cms-key="inside.image.overlap" />
+                                    <img data-cms-fallback-src="/images/EasyVariants application.jpg.jpeg" alt="EasyVariants Application" class="w-full h-auto object-cover cms-media-pending" data-cms-key="inside.image.overlap" />
                                 </div>
                             </div>
                         </div>
@@ -3393,14 +3412,14 @@
                         <p class="ez-section-desc" data-cms-key="demos.description">Explore enterprise-ready design automation flows built for high-volume manufacturing environments.</p>
                     </div>
 
-                    <div class="demo-showcase" data-cms-key="demos.videos">
+                    <div class="demo-showcase cms-media-pending" data-cms-key="demos.videos">
                         <div class="demo-showcase__bar">
                             <div class="demo-showcase__meta">
                                 <span class="material-symbols-outlined" aria-hidden="true">play_circle</span>
-                                <p class="demo-showcase__title" id="demo-video-current-title">EasyVariants Explainer Video</p>
+                                <p class="demo-showcase__title" id="demo-video-current-title">Loading demos…</p>
                             </div>
                             <div class="demo-showcase__controls">
-                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">1 / 3</span>
+                                <span class="demo-showcase__counter" id="demo-video-counter" aria-live="polite">–</span>
                                 <button type="button" id="light-prev" aria-label="Previous demo video" class="demo-showcase__nav ez-icon-btn">
                                     <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
                                 </button>
@@ -3798,11 +3817,16 @@
             }, { once: true });
 
             /* ═══ DEMO VIDEO GLIDER (thumbnail slides + in-place playback) ═══ */
+            /* Temporarily hidden — restore to defaultDemoVideos / clear this list to unhide */
+            const HIDDEN_DEMO_VIDEO_SRCS = [
+                '/images/EasyVariantsExplainerVideo_Apparel.mp4',
+            ];
             const defaultDemoVideos = [
-                { src: "/images/EasyVariantsExplainerVideo_Apparel.mp4", title: "EasyVariants Demo  Apparel", label: "Apparel" },
+                // { src: "/images/EasyVariantsExplainerVideo_Apparel.mp4", title: "EasyVariants Demo  Apparel", label: "Apparel" },
                 { src: "/images/EasyVariantsExplainerVideo_Headwear_v02.mp4", title: "EasyVariants Demo  Headwear", label: "Headwear" },
                 { src: "/images/EasyVariants_Explainer.mp4", title: "EasyVariants Explainer Video", label: "Explainer" },
             ];
+            const DEMO_VIDEO_SLOT_COUNT = 2;
 
             function getDemoYouTubeId(value) {
                 const input = String(value || '').trim();
@@ -3844,17 +3868,27 @@
                 };
             }
 
+            function isHiddenDemoVideo(v) {
+                const src = String(v?.src || '').trim();
+                return HIDDEN_DEMO_VIDEO_SRCS.some(
+                    (hidden) => src === hidden || src.endsWith(hidden)
+                );
+            }
+
             function getDemoVideosFromCms() {
                 const cms = window.__EZ_CMS__?.blocks?.['demos.videos'];
                 let list =
                     cms?.type === 'list' && Array.isArray(cms.value) && cms.value.length
-                        ? cms.value.map(normalizeDemoVideo).filter((v) => v.src).slice(0, 3)
+                        ? cms.value
+                              .map(normalizeDemoVideo)
+                              .filter((v) => v.src && !isHiddenDemoVideo(v))
+                              .slice(0, DEMO_VIDEO_SLOT_COUNT)
                         : defaultDemoVideos.map(normalizeDemoVideo);
                 if (!list.length) list = defaultDemoVideos.map(normalizeDemoVideo);
-                if (list.length > 3) list = list.slice(0, 3);
-                if (list.length < 3) {
+                if (list.length > DEMO_VIDEO_SLOT_COUNT) list = list.slice(0, DEMO_VIDEO_SLOT_COUNT);
+                if (list.length < DEMO_VIDEO_SLOT_COUNT) {
                     const base = [...list];
-                    while (list.length < 3) {
+                    while (list.length < DEMO_VIDEO_SLOT_COUNT) {
                         list.push({ ...base[list.length % base.length] });
                     }
                 }
@@ -4094,8 +4128,24 @@
                 startAutoSlide();
             }
 
-            initDemoGlider();
-            document.addEventListener('ez-cms-loaded', initDemoGlider);
+            /* Wait for CMS so Cloudflare videos render first — not local defaults */
+            let demoGliderBooted = false;
+            const bootDemoGlider = () => {
+                demoGliderBooted = true;
+                document
+                    .querySelector('.demo-showcase[data-cms-key="demos.videos"]')
+                    ?.classList.remove('cms-media-pending');
+                initDemoGlider();
+            };
+            document.addEventListener('ez-cms-loaded', bootDemoGlider);
+            if (window.__EZ_CMS__ || document.body.classList.contains('ez-cms-ready')) {
+                bootDemoGlider();
+            } else {
+                // Safety: if CMS never responds, still show local fallbacks
+                setTimeout(() => {
+                    if (!demoGliderBooted) bootDemoGlider();
+                }, 4000);
+            }
 
             /* ═══ PROBLEM CARD CAROUSEL ═══ */
             const problemCarouselEl = document.getElementById('problem-carousel');
